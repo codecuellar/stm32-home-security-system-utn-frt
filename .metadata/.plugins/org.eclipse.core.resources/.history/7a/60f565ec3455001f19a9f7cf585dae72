@@ -1,0 +1,63 @@
+/* Includes ------------------------------------------------------------------*/
+#include "main.h"
+#include "string.h"
+
+/* Private variables ---------------------------------------------------------*/
+ETH_HandleTypeDef heth;
+UART_HandleTypeDef huart3;
+PCD_HandleTypeDef hpcd_USB_OTG_FS;
+
+/* Private function prototypes -----------------------------------------------*/
+void SystemClock_Config(void);
+static void MX_GPIO_Init(void);
+static void MX_ETH_Init(void);
+static void MX_USART3_UART_Init(void);
+static void MX_USB_OTG_FS_PCD_Init(void);
+
+/* User Code BEGIN PV */
+GPIO_TypeDef* LED_PORTS[] = {GPIOB, GPIOB, GPIOB};
+uint16_t LED_PINS[] = {GPIO_PIN_0, GPIO_PIN_7, GPIO_PIN_14};
+int num_leds = 3;
+uint8_t button_state = 0;
+uint8_t last_button_state = 0;
+int current_time_index = 0;
+const int times[] = {100, 250, 500, 1000};
+/* User Code END PV */
+
+int main(void)
+{
+  /* MCU Configuration--------------------------------------------------------*/
+  HAL_Init();
+  SystemClock_Config();
+  MX_GPIO_Init();
+  MX_ETH_Init();
+  MX_USART3_UART_Init();
+  MX_USB_OTG_FS_PCD_Init();
+
+  while (1)
+  {
+    /* User Code BEGIN WHILE */
+    button_state = HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_13);
+    if (button_state == GPIO_PIN_SET && last_button_state == GPIO_PIN_RESET)
+    {
+      current_time_index = (current_time_index + 1) % 4;
+    }
+    last_button_state = button_state;
+
+    for (int i = 0; i < num_leds; i++) {
+      HAL_GPIO_WritePin(LED_PORTS[i], LED_PINS[i], GPIO_PIN_SET);
+    }
+    HAL_Delay(times[current_time_index]);
+    for (int i = 0; i < num_leds; i++) {
+      HAL_GPIO_WritePin(LED_PORTS[i], LED_PINS[i], GPIO_PIN_RESET);
+    }
+    HAL_Delay(times[current_time_index]);
+    /* User Code END WHILE */
+  }
+}
+
+void SystemClock_Config(void) { /* ... Your configuration code ... */ }
+static void MX_GPIO_Init(void) { /* ... Your GPIO init code ... */ }
+static void MX_ETH_Init(void) { /* ... Your ETH init code ... */ }
+static void MX_USART3_UART_Init(void) { /* ... Your USART init code ... */ }
+static void MX_USB_OTG_FS_PCD_Init(void) { /* ... Your USB OTG init code ... */ }
