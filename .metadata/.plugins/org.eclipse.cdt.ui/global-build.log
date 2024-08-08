@@ -1,14 +1,14 @@
-01:12:51 **** Incremental Build of configuration Debug for project App_1_2_Grupo_6_2024 ****
+11:26:08 **** Incremental Build of configuration Debug for project App_1_4_Grupo_6_2024 ****
 make -j8 all 
-arm-none-eabi-size  App_1_2_Grupo_6_2024.elf 
+arm-none-eabi-size  App_1_4_Grupo_6_2024.elf 
    text	   data	    bss	    dec	    hex	filename
-  12740	     12	   3452	  16204	   3f4c	App_1_2_Grupo_6_2024.elf
+  12736	     12	   3452	  16200	   3f48	App_1_4_Grupo_6_2024.elf
 Finished building: default.size.stdout
  
-01:12:58 **** Incremental Build of configuration Debug for project App_1_2_Grupo_6_2024 ****
+11:26:11 **** Incremental Build of configuration Debug for project App_1_4_Grupo_6_2024 ****
 make -j8 all 
-arm-none-eabi-size  App_1_2_Grupo_6_2024.elf 
+arm-none-eabi-size  App_1_4_Grupo_6_2024.elf 
    text	   data	    bss	    dec	    hex	filename
-  12740	     12	   3452	  16204	   3f4c	App_1_2_Grupo_6_2024.elf
+  12736	     12	   3452	  16200	   3f48	App_1_4_Grupo_6_2024.elf
 Finished building: default.size.stdout
  
