@@ -96,40 +96,56 @@ void Secuencia2() {
 }
 
 void Secuencia3() {
-    uint32_t led1_last_toggle = HAL_GetTick();
-    uint32_t led2_last_toggle = HAL_GetTick();
-    uint32_t led3_last_toggle = HAL_GetTick();
 
-    while (button_state == GPIO_PIN_RESET) {
-        uint32_t current_time = HAL_GetTick();
+		// Intervalos de parpadeo en milisegundos
+	    const int led1_interval = 100; // LED 1 parpadea cada 100ms
+	    const int led2_interval = 300; // LED 2 parpadea cada 300ms
+	    const int led3_interval = 600; // LED 3 parpadea cada 600ms
 
-        // Parpadeo del LED 1 (100ms)
-        if (current_time - led1_last_toggle >= 100) {
-            HAL_GPIO_TogglePin(LED_PORTS[0], LED_PINS[0]);
-            led1_last_toggle = current_time;
-        }
+	    // Variables para almacenar el último tiempo de cambio de estado
+	    uint32_t led1_last_toggle = HAL_GetTick();
+	    uint32_t led2_last_toggle = HAL_GetTick();
+	    uint32_t led3_last_toggle = HAL_GetTick();
 
-        // Parpadeo del LED 2 (300ms)
-        if (current_time - led2_last_toggle >= 300) {
-            HAL_GPIO_TogglePin(LED_PORTS[1], LED_PINS[1]);
-            led2_last_toggle = current_time;
-        }
+	    // Estados iniciales de los LEDs
+	    GPIO_PinState led1_state = GPIO_PIN_RESET;
+	    GPIO_PinState led2_state = GPIO_PIN_RESET;
+	    GPIO_PinState led3_state = GPIO_PIN_RESET;
 
-        // Parpadeo del LED 3 (600ms)
-        if (current_time - led3_last_toggle >= 600) {
-            HAL_GPIO_TogglePin(LED_PORTS[2], LED_PINS[2]);
-            led3_last_toggle = current_time;
-        }
+	    while (button_state == GPIO_PIN_RESET) {
+	            uint32_t current_time = HAL_GetTick();
 
-        // Leer el estado del pulsador
-        button_state = HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_13);
+	            // Controlar el parpadeo del LED 1
+	            if (current_time - led1_last_toggle >= led1_interval) {
+	                led1_state = (led1_state == GPIO_PIN_SET) ? GPIO_PIN_RESET : GPIO_PIN_SET;
+	                HAL_GPIO_WritePin(LED_PORTS[0], LED_PINS[0], led1_state);
+	                led1_last_toggle = current_time;
+	            }
 
-        // Pequeña demora para evitar alta carga del CPU (opcional)
-        HAL_Delay(1);
-    }
+	            // Controlar el parpadeo del LED 2
+	            if (current_time - led2_last_toggle >= led2_interval) {
+	                led2_state = (led2_state == GPIO_PIN_SET) ? GPIO_PIN_RESET : GPIO_PIN_SET;
+	                HAL_GPIO_WritePin(LED_PORTS[1], LED_PINS[1], led2_state);
+	                led2_last_toggle = current_time;
+	            }
 
+	            // Controlar el parpadeo del LED 3
+	            if (current_time - led3_last_toggle >= led3_interval) {
+	                led3_state = (led3_state == GPIO_PIN_SET) ? GPIO_PIN_RESET : GPIO_PIN_SET;
+	                HAL_GPIO_WritePin(LED_PORTS[2], LED_PINS[2], led3_state);
+	                led3_last_toggle = current_time;
+	            }
 
-}
+	            // Actualizar el estado del pulsador
+	            button_state = HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_13);
+
+	            // Pequeña demora para evitar alta carga del CPU (opcional)
+	            HAL_Delay(1);
+	        }
+
+	        // Actualizar la variable 'sequence' para pasar a la siguiente secuencia
+	        sequence = (sequence + 1) % 4;
+	    }
 
 
 void Secuencia4() {

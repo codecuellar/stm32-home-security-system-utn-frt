@@ -128,7 +128,8 @@ void Secuencia3() {
         HAL_Delay(1);
     }
 
-
+    // Actualizar la variable 'sequence' para pasar a la siguiente secuencia
+    sequence = (sequence + 1) % 4;
 }
 
 
