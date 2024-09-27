@@ -18,6 +18,7 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "API_GPIO.h"  // Incluyo el driver GPIO
 #include "string.h"
 
 /* Private includes ----------------------------------------------------------*/
@@ -64,7 +65,7 @@ int sequence = 0; // Secuencia actual (0 a 3)
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
-static void MX_GPIO_Init(void);
+void MX_GPIO_Init(void);
 static void MX_ETH_Init(void);
 static void MX_USART3_UART_Init(void);
 static void MX_USB_OTG_FS_PCD_Init(void);
@@ -74,74 +75,69 @@ static void MX_USB_OTG_FS_PCD_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
+/* Función para secuencia 1 */
 void Secuencia1() {
     for (int i = 0; i < num_leds; i++) {
-        HAL_GPIO_WritePin(LED_PORTS[i], LED_PINS[i], GPIO_PIN_SET);
-        HAL_Delay(150);
-        HAL_GPIO_WritePin(LED_PORTS[i], LED_PINS[i], GPIO_PIN_RESET);
-        HAL_Delay(150);
+    	LED_On((led_T)i);  // Enciende el LED usando el driver
+    	HAL_Delay(150);
+    	LED_Off((led_T)i);  // Apaga el LED usando el driver
+    	HAL_Delay(150);
     }
 }
-
+/* Función para secuencia 2 */
 void Secuencia2() {
-    for (int i = 0; i < 3; i++) {
-        HAL_GPIO_WritePin(LED_PORTS[i], LED_PINS[i], GPIO_PIN_SET);
+    for (int i = 0; i < num_leds; i++) {
+    	LED_On((led_T)i);  // Enciende todos los LEDs
     }
     HAL_Delay(300);
     for (int i = 0; i < 3; i++) {
-        HAL_GPIO_WritePin(LED_PORTS[i], LED_PINS[i], GPIO_PIN_RESET);
+    	LED_Off((led_T)i);  // Apaga todos los LEDs
     }
     HAL_Delay(300);
 }
-
+/* Función para secuencia 3 */
 void Secuencia3() {
     uint32_t led1_last_toggle = HAL_GetTick();
     uint32_t led2_last_toggle = HAL_GetTick();
     uint32_t led3_last_toggle = HAL_GetTick();
 
-    while (button_state == GPIO_PIN_RESET) {
+    while (readButton_GPIO() == false) {
         uint32_t current_time = HAL_GetTick();
 
         // Parpadeo del LED 1 (100ms)
         if (current_time - led1_last_toggle >= 100) {
-            HAL_GPIO_TogglePin(LED_PORTS[0], LED_PINS[0]);
+        	LED_Toggle(LD1);  // Cambiar el estado del LED
             led1_last_toggle = current_time;
         }
 
         // Parpadeo del LED 2 (300ms)
         if (current_time - led2_last_toggle >= 300) {
-            HAL_GPIO_TogglePin(LED_PORTS[1], LED_PINS[1]);
+        	LED_Toggle(LD2);  // Cambiar el estado del LED
             led2_last_toggle = current_time;
         }
 
         // Parpadeo del LED 3 (600ms)
         if (current_time - led3_last_toggle >= 600) {
-            HAL_GPIO_TogglePin(LED_PORTS[2], LED_PINS[2]);
+        	LED_Toggle(LD3);  // Cambiar el estado del LED
             led3_last_toggle = current_time;
         }
 
-        // Leer el estado del pulsador
-        button_state = HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_13);
 
-        // Pequeña demora para evitar alta carga del CPU (opcional)
         HAL_Delay(1);
     }
 
-
 }
 
-
+/* Función para secuencia 4 */
 void Secuencia4() {
-    HAL_GPIO_WritePin(LED_PORTS[0], LED_PINS[0], GPIO_PIN_SET);
-    HAL_GPIO_WritePin(LED_PORTS[2], LED_PINS[2], GPIO_PIN_SET);
-    HAL_GPIO_WritePin(LED_PORTS[1], LED_PINS[1], GPIO_PIN_RESET);
-    HAL_Delay(150);
-    HAL_GPIO_WritePin(LED_PORTS[0], LED_PINS[0], GPIO_PIN_RESET);
-    HAL_GPIO_WritePin(LED_PORTS[2], LED_PINS[2], GPIO_PIN_RESET);
-    HAL_GPIO_WritePin(LED_PORTS[1], LED_PINS[1], GPIO_PIN_SET);
-    HAL_Delay(150);
-    HAL_GPIO_WritePin(LED_PORTS[1], LED_PINS[1], GPIO_PIN_RESET);
+	LED_On(LD1);  // Enciende LED 1
+	LED_On(LD3);  // Enciende LED 3
+	LED_Off(LD2);  // Apaga LED 2
+	HAL_Delay(150);
+	LED_Off(LD1);
+	LED_Off(LD3);
+	LED_On(LD2);
+	HAL_Delay(150);
 }
 
 /* USER CODE END 0 */
@@ -184,10 +180,10 @@ int main(void)
   while (1)
   {
       // Leer el estado del pulsador
-      button_state = HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_13);
+      button_state = readButton_GPIO();
 
       // Detectar el flanco de subida (cambio de estado de 0 a 1)
-      if (button_state == GPIO_PIN_SET && last_button_state == GPIO_PIN_RESET)
+      if (button_state && !last_button_state)
       {
           sequence = (sequence + 1) % 4; // Cambiar a la siguiente secuencia
       }
@@ -343,32 +339,32 @@ static void MX_USB_OTG_FS_PCD_Init(void)
   * @param None
   * @retval None
   */
-static void MX_GPIO_Init(void)
-{
-  GPIO_InitTypeDef GPIO_InitStruct = {0};
+/*void MX_GPIO_Init(void)
+{*/
+  /*GPIO_InitTypeDef GPIO_InitStruct = {0};*/
 
   /* GPIO Ports Clock Enable */
-  __HAL_RCC_GPIOC_CLK_ENABLE();
-  __HAL_RCC_GPIOH_CLK_ENABLE();
-  __HAL_RCC_GPIOA_CLK_ENABLE();
-  __HAL_RCC_GPIOB_CLK_ENABLE();
+  /*HAL_RCC_GPIOC_CLK_ENABLE();*/
+/*HAL_RCC_GPIOH_CLK_ENABLE();*/
+  /*HAL_RCC_GPIOA_CLK_ENABLE();*/
+  /*HAL_RCC_GPIOB_CLK_ENABLE();*/
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0|GPIO_PIN_7|GPIO_PIN_14, GPIO_PIN_RESET);
+  /*HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0|GPIO_PIN_7|GPIO_PIN_14, GPIO_PIN_RESET);*/
 
   /*Configure GPIO pin : PC13 */
-  GPIO_InitStruct.Pin = GPIO_PIN_13;
+  /*GPIO_InitStruct.Pin = GPIO_PIN_13;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
-  HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
+  HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);*/
 
   /*Configure GPIO pins : PB0 PB7 PB14 */
-  GPIO_InitStruct.Pin = GPIO_PIN_0|GPIO_PIN_7|GPIO_PIN_14;
+  /*GPIO_InitStruct.Pin = GPIO_PIN_0|GPIO_PIN_7|GPIO_PIN_14;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
-}
+}*/
 
 /* USER CODE BEGIN 4 */
 

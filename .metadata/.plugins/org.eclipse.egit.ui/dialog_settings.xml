@@ -6,4 +6,9 @@
 		<item key="STAGING_SASH_FORM_WEIGHT" value="500,500"/>
 		<item key="sortItemState" value="false"/>
 	</section>
+	<section name="GitCommitMessageComponent">
+		<list key="C:\Users\crist\STM32CubeIDE\workspace_1.15.1\.git">
+			<item value="empty"/>
+		</list>
+	</section>
 </section>

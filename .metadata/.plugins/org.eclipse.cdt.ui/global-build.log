@@ -1,14 +1,14 @@
-12:09:14 **** Incremental Build of configuration Debug for project App_1_3_Grupo_6_2024 ****
+15:35:28 **** Incremental Build of configuration Debug for project DRIVER_GPIO ****
 make -j8 all 
-arm-none-eabi-size  App_1_3_Grupo_6_2024.elf 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F429xx -c -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -I"C:/Users/crist/STM32CubeIDE/workspace_1.15.1/DRIVER_GPIO/Drivers/API/Inc" -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
+arm-none-eabi-gcc -o "DRIVER_GPIO.elf" @"objects.list"   -mcpu=cortex-m4 -T"C:\Users\crist\STM32CubeIDE\workspace_1.15.1\DRIVER_GPIO\STM32F429ZITX_FLASH.ld" --specs=nosys.specs -Wl,-Map="DRIVER_GPIO.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: DRIVER_GPIO.elf
+ 
+arm-none-eabi-size  DRIVER_GPIO.elf 
+arm-none-eabi-objdump -h -S DRIVER_GPIO.elf  > "DRIVER_GPIO.list"
    text	   data	    bss	    dec	    hex	filename
-  13124	     36	   3140	  16300	   3fac	App_1_3_Grupo_6_2024.elf
+  12792	     12	   3452	  16256	   3f80	DRIVER_GPIO.elf
 Finished building: default.size.stdout
  
-12:09:17 **** Incremental Build of configuration Debug for project App_1_3_Grupo_6_2024 ****
-make -j8 all 
-arm-none-eabi-size  App_1_3_Grupo_6_2024.elf 
-   text	   data	    bss	    dec	    hex	filename
-  13124	     36	   3140	  16300	   3fac	App_1_3_Grupo_6_2024.elf
-Finished building: default.size.stdout
+Finished building: DRIVER_GPIO.list
  

@@ -60,8 +60,8 @@ all: main-build
 main-build: Ejemplo01_Inicio_Blinking.elf secondary-outputs
 
 # Tool invocations
-Ejemplo01_Inicio_Blinking.elf Ejemplo01_Inicio_Blinking.map: $(OBJS) $(USER_OBJS) C:\Users\Lenovo\Dropbox\Tecnicas_Digitales_II\Ejemplo01_Inicio_Blinking\STM32F413ZHTX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "Ejemplo01_Inicio_Blinking.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\Lenovo\Dropbox\Tecnicas_Digitales_II\Ejemplo01_Inicio_Blinking\STM32F413ZHTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="Ejemplo01_Inicio_Blinking.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Ejemplo01_Inicio_Blinking.elf Ejemplo01_Inicio_Blinking.map: $(OBJS) $(USER_OBJS) C:\Users\crist\STM32CubeIDE\workspace_1.15.1\Tecnicas_Digitales_II-main.zip_expanded\Tecnicas_Digitales_II-main\Ejemplo01_Inicio_Blinking\STM32F413ZHTX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-gcc -o "Ejemplo01_Inicio_Blinking.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\crist\STM32CubeIDE\workspace_1.15.1\Tecnicas_Digitales_II-main.zip_expanded\Tecnicas_Digitales_II-main\Ejemplo01_Inicio_Blinking\STM32F413ZHTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="Ejemplo01_Inicio_Blinking.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 
