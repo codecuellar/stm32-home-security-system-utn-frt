@@ -1,3 +1,7 @@
 .metadata/
+# Ignora Debug en todas partes, excepto en AFP1, AFP2 y AFP3
 **/Debug/
+!AFP1_TDII_Grupo6/Debug/
+!AFP2_TDII_Grupo6/Debug/
+!AFP3_TDII_Grupo6/Debug/
 **/.settings/
