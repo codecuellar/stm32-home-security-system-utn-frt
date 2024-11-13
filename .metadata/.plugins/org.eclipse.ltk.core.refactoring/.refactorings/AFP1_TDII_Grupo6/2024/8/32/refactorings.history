@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Rename resource &apos;AFP1_TDII_Grupo6/App_1_4_Grupo_6_2024/AFP1_TDII_Grupo6.ioc&apos; to &apos;AFP1_TDII_Grupo6-App_1_4.ioc&apos;" description="Rename resource &apos;AFP1_TDII_Grupo6.ioc&apos;" flags="7" id="org.eclipse.ltk.core.refactoring.rename.resource" input="App_1_4_Grupo_6_2024/AFP1_TDII_Grupo6.ioc" name="AFP1_TDII_Grupo6-App_1_4.ioc" stamp="1723044836566" updateReferences="true"/>
+</session>

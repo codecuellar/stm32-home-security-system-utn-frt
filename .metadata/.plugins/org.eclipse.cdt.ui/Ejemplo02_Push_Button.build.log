@@ -1,0 +1,10 @@
+01:27:16 **** Build of configuration Debug for project Ejemplo02_Push_Button ****
+make -j8 all 
+arm-none-eabi-size  Ejemplo02_Push_Button.elf 
+   text	   data	    bss	    dec	    hex	filename
+  11984	     12	   2892	  14888	   3a28	Ejemplo02_Push_Button.elf
+Finished building: default.size.stdout
+ 
+
+01:27:25 Build Finished. 0 errors, 0 warnings. (took 9s.323ms)
+

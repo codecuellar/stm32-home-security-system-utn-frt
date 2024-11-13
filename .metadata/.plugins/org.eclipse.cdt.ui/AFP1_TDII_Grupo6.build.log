@@ -1,0 +1,10 @@
+01:26:41 **** Build of configuration Debug for project AFP1_TDII_Grupo6 ****
+make -j8 all 
+arm-none-eabi-size  AFP1_TDII_Grupo6.elf 
+   text	   data	    bss	    dec	    hex	filename
+  12548	     12	   3452	  16012	   3e8c	AFP1_TDII_Grupo6.elf
+Finished building: default.size.stdout
+ 
+
+01:26:43 Build Finished. 0 errors, 0 warnings. (took 1s.914ms)
+
