@@ -42,4 +42,16 @@ void debounceFSM_update(void);
   */
 bool_t readKey(void);
 
+/**
+  * @brief  Función de manejo del evento de pulsación del botón.
+  * @note   Esta función invierte el estado del LED3 como ejemplo.
+  */
+void buttonPressed(void);
+
+/**
+  * @brief  Función de manejo del evento de liberación del botón.
+  * @note   Esta función es declarada según el enunciado pero no hace nada en particular.
+  */
+void buttonReleased(void);
+
 #endif // API_DEBOUNCE_H

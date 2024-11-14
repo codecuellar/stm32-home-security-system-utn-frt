@@ -54,3 +54,65 @@ This warning can be switched off on the Team > Git > Confirmations and Warnings 
 
 !ENTRY com.st.stm32cube.ide.mcu.ide 1 1 2024-11-12 00:59:49.242
 !MESSAGE Started RMI Server, listening on port 41337
+!SESSION 2024-11-13 21:46:57.239 -----------------------------------------------
+eclipse.buildId=Version 1.15.1
+java.version=17.0.8.1
+java.vendor=Eclipse Adoptium
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=es_MX
+Command-line arguments:  -os win32 -ws win32 -arch x86_64
+
+!ENTRY com.st.stm32cube.ide.mcu.informationcenter 4 4 2024-11-13 21:48:20.082
+!MESSAGE CubeMX plugin appears to be active, Log4j initialization might be too late.
+
+!ENTRY com.st.stm32cube.ide.mcu.informationcenter 1 1 2024-11-13 21:48:20.100
+!MESSAGE Log4j2 initialized with config file C:\Users\crist\STM32CubeIDE\AFP_3_TDII_2024\.metadata\.log4j2.xml
+
+!ENTRY org.eclipse.egit.ui 2 0 2024-11-13 21:48:37.124
+!MESSAGE Warning: The environment variable HOME is not set. The following directory will be used to store the Git
+user global configuration and to define the default location to store repositories: 'C:\Users\crist'. If this is
+not correct please set the HOME environment variable and restart Eclipse. Otherwise Git for Windows and
+EGit might behave differently since they see different configuration options.
+This warning can be switched off on the Team > Git > Confirmations and Warnings preference page.
+
+!ENTRY com.st.stm32cube.ide.mcu.ide 1 1 2024-11-13 21:49:02.260
+!MESSAGE Started RMI Server, listening on port 41337
+
+!ENTRY org.eclipse.ui.workbench 4 2 2024-11-13 21:50:56.756
+!MESSAGE Problems occurred when invoking code from plug-in: "org.eclipse.ui.workbench".
+!STACK 0
+com.teamdev.jxbrowser.navigation.TimeoutException: Failed to complete the navigation within 10 seconds.
+	at com.teamdev.jxbrowser.navigation.internal.NavigationImpl.loadAndWait(NavigationImpl.java:232)
+	at com.teamdev.jxbrowser.navigation.internal.NavigationImpl.loadUrlAndWait(NavigationImpl.java:104)
+	at com.teamdev.jxbrowser.navigation.internal.NavigationImpl.loadUrlAndWait(NavigationImpl.java:91)
+	at com.st.microxplorer.plugins.userauth.WebApp.startREACTclient(WebApp.java:546)
+	at com.st.microxplorer.plugins.userauth.WebApp.<init>(WebApp.java:193)
+	at com.st.microxplorer.plugins.userauth.WebApp.getInstance(WebApp.java:714)
+	at com.st.microxplorer.plugins.userauth.UserAuth.getBrowserView(UserAuth.java:417)
+	at com.st.microxplorer.plugins.userauth.UserAuth.getSpecificTask(UserAuth.java:254)
+	at com.st.stm32cube.common.mx.userauth.UserAuthAdapter.addListener(UserAuthAdapter.java:51)
+	at com.st.stm32cube.ide.mcu.userauth.UserAuthStartup.earlyStartup(UserAuthStartup.java:42)
+	at org.eclipse.ui.internal.EarlyStartupRunnable.runEarlyStartup(EarlyStartupRunnable.java:79)
+	at org.eclipse.ui.internal.EarlyStartupRunnable.run(EarlyStartupRunnable.java:55)
+	at org.eclipse.core.runtime.SafeRunner.run(SafeRunner.java:47)
+	at org.eclipse.ui.internal.Workbench$39.run(Workbench.java:2762)
+	at org.eclipse.core.internal.jobs.Worker.run(Worker.java:63)
+
+!ENTRY org.eclipse.ui 4 0 2024-11-13 21:50:56.861
+!MESSAGE Unable to execute early startup code for the org.eclipse.ui.IStartup extension contributed by the 'com.st.stm32cube.ide.mcu.ide' plug-in.
+!STACK 0
+com.teamdev.jxbrowser.navigation.TimeoutException: Failed to complete the navigation within 10 seconds.
+	at com.teamdev.jxbrowser.navigation.internal.NavigationImpl.loadAndWait(NavigationImpl.java:232)
+	at com.teamdev.jxbrowser.navigation.internal.NavigationImpl.loadUrlAndWait(NavigationImpl.java:104)
+	at com.teamdev.jxbrowser.navigation.internal.NavigationImpl.loadUrlAndWait(NavigationImpl.java:91)
+	at com.st.microxplorer.plugins.userauth.WebApp.startREACTclient(WebApp.java:546)
+	at com.st.microxplorer.plugins.userauth.WebApp.<init>(WebApp.java:193)
+	at com.st.microxplorer.plugins.userauth.WebApp.getInstance(WebApp.java:714)
+	at com.st.microxplorer.plugins.userauth.UserAuth.getBrowserView(UserAuth.java:417)
+	at com.st.microxplorer.plugins.userauth.UserAuth.getSpecificTask(UserAuth.java:254)
+	at com.st.stm32cube.common.mx.userauth.UserAuthAdapter.addListener(UserAuthAdapter.java:51)
+	at com.st.stm32cube.ide.mcu.userauth.UserAuthStartup.earlyStartup(UserAuthStartup.java:42)
+	at org.eclipse.ui.internal.EarlyStartupRunnable.runEarlyStartup(EarlyStartupRunnable.java:79)
+	at org.eclipse.ui.internal.EarlyStartupRunnable.run(EarlyStartupRunnable.java:55)
+	at org.eclipse.core.runtime.SafeRunner.run(SafeRunner.java:47)
+	at org.eclipse.ui.internal.Workbench$39.run(Workbench.java:2762)
+	at org.eclipse.core.internal.jobs.Worker.run(Worker.java:63)

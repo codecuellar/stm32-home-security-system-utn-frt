@@ -1,5 +1,5 @@
 
-AFP_3_App_1_1_Grupo_6_2024.elf:     file format elf32-littlearm
+AFP_3_App_1_2_Grupo_6_2024.elf:     file format elf32-littlearm
 
 Sections:
 Idx Name          Size      VMA       LMA       File off  Algn
@@ -29,25 +29,25 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   ALLOC
  12 .ARM.attributes 00000030  00000000  00000000  0000500c  2**0
                   CONTENTS, READONLY
- 13 .debug_info   0000e546  00000000  00000000  0000503c  2**0
+ 13 .debug_info   0000e55e  00000000  00000000  0000503c  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 14 .debug_abbrev 00001f4d  00000000  00000000  00013582  2**0
+ 14 .debug_abbrev 00001f4d  00000000  00000000  0001359a  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 15 .debug_aranges 00000b98  00000000  00000000  000154d0  2**3
+ 15 .debug_aranges 00000b98  00000000  00000000  000154e8  2**3
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 16 .debug_rnglists 000008e8  00000000  00000000  00016068  2**0
+ 16 .debug_rnglists 000008e8  00000000  00000000  00016080  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 17 .debug_macro  000240c1  00000000  00000000  00016950  2**0
+ 17 .debug_macro  000240c1  00000000  00000000  00016968  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 18 .debug_line   0000de34  00000000  00000000  0003aa11  2**0
+ 18 .debug_line   0000de34  00000000  00000000  0003aa29  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 19 .debug_str    000d9333  00000000  00000000  00048845  2**0
+ 19 .debug_str    000d9387  00000000  00000000  0004885d  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 20 .comment      00000043  00000000  00000000  00121b78  2**0
+ 20 .comment      00000043  00000000  00000000  00121be4  2**0
                   CONTENTS, READONLY
- 21 .debug_frame  00003074  00000000  00000000  00121bbc  2**2
+ 21 .debug_frame  00003074  00000000  00000000  00121c28  2**2
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 22 .debug_line_str 00000075  00000000  00000000  00124c30  2**0
+ 22 .debug_line_str 00000075  00000000  00000000  00124c9c  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
 
 Disassembly of section .text:
@@ -1668,7 +1668,7 @@ Infinite_Loop:
 #include "stm32f4xx_hal.h"  // Incluye la HAL de STM32 para usar HAL_GetTick()
 #include "main.h"
 
-void delayInit(delay_t *delay, uint32_t duration) {
+void delayInit(delay_t *delay, tick_t duration) {
  8000ba6:	b580      	push	{r7, lr}
  8000ba8:	b082      	sub	sp, #8
  8000baa:	af00      	add	r7, sp, #0

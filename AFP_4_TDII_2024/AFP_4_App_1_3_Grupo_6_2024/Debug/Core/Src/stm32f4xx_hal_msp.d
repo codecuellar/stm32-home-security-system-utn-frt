@@ -28,7 +28,10 @@ Core/Src/stm32f4xx_hal_msp.o: ../Core/Src/stm32f4xx_hal_msp.c \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pcd.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_ll_usb.h \
- ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pcd_ex.h
+ ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pcd_ex.h \
+ C:/Users/crist/STM32CubeIDE/AFP_4_TDII_2024/AFP_4_App_1_3_Grupo_6_2024/Drivers/API/Inc/API_Debounce.h \
+ C:/Users/crist/STM32CubeIDE/AFP_4_TDII_2024/AFP_4_App_1_3_Grupo_6_2024/Drivers/API/Inc/API_Delay.h \
+ C:/Users/crist/STM32CubeIDE/AFP_4_TDII_2024/AFP_4_App_1_3_Grupo_6_2024/Drivers/API/Inc/API_Delay.h
 ../Core/Inc/main.h:
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h:
 ../Core/Inc/stm32f4xx_hal_conf.h:
@@ -60,3 +63,6 @@ Core/Src/stm32f4xx_hal_msp.o: ../Core/Src/stm32f4xx_hal_msp.c \
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pcd.h:
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_ll_usb.h:
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pcd_ex.h:
+C:/Users/crist/STM32CubeIDE/AFP_4_TDII_2024/AFP_4_App_1_3_Grupo_6_2024/Drivers/API/Inc/API_Debounce.h:
+C:/Users/crist/STM32CubeIDE/AFP_4_TDII_2024/AFP_4_App_1_3_Grupo_6_2024/Drivers/API/Inc/API_Delay.h:
+C:/Users/crist/STM32CubeIDE/AFP_4_TDII_2024/AFP_4_App_1_3_Grupo_6_2024/Drivers/API/Inc/API_Delay.h:

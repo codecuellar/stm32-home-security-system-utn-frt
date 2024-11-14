@@ -15,8 +15,8 @@ static delay_t debounceDelay;           // Delay no bloqueante para anti-rebote
 static bool_t buttonPressedFlag = false;
 
 // Prototipos de funciones privadas
-static void buttonPressed();           // Función para manejar el evento de pulsación del botón
-static void buttonReleased();          // Función para manejar el evento de liberación del botón
+void buttonPressed();           // Función para manejar el evento de pulsación del botón
+void buttonReleased();          // Función para manejar el evento de liberación del botón
 
 /**
   * @brief  Inicialización de la MEF de anti-rebote
@@ -88,7 +88,7 @@ bool_t readKey(void) {
 /**
   * @brief  Función de manejo del evento de pulsación del botón.
   */
-static void buttonPressed(void) {
+void buttonPressed(void) {
     buttonPressedFlag = true;                // Marca el flag para indicar la pulsación
     HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_0);   // Alterna el estado del LED1 como ejemplo
 }
@@ -96,6 +96,6 @@ static void buttonPressed(void) {
 /**
   * @brief  Función de manejo del evento de liberación del botón.
   */
-static void buttonReleased(void) {
+void buttonReleased(void) {
     HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_14);  // Alterna el estado del LED3 como ejemplo
 }

@@ -28,6 +28,8 @@ extern "C" {
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f4xx_hal.h"
+#include "API_Debounce.h"
+#include "API_Delay.h"      // Para el uso de retardos no bloqueantes
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */

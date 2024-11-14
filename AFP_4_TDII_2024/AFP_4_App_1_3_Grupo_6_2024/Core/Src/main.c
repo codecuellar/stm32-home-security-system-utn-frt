@@ -81,7 +81,7 @@ delay_t delay_led1;
 delay_t delay_led2;
 delay_t delay_led3;
 delay_t delay_sequence;
-int current_led = 0;  // Para controlar quÃ© LED estÃ¡ activo en la secuencia 1
+int current_led = 0;  // Para controlar que LED esta activo en la secuencia 1
 
 /* USER CODE END PV */
 
@@ -234,11 +234,11 @@ int main(void)
       // // Verificar si se presionó el botón usando readKey()
       if (readKey())
       {
-          sequence = (sequence + 1) % 4; // Cambiar a la siguiente secuencia
-          // Reiniciar las variables de inicializaciÃ³n al cambiar de secuencia
-          for (int i = 0; i < num_leds; i++) {
-                      LED_Off((led_T)i);
-                  }
+    	  sequence = (sequence + 1) % 4; // Cambiar a la siguiente secuencia
+    	  // Reiniciar las variables de inicialización al cambiar de secuencia
+    	  for (int i = 0; i < num_leds; i++) {
+    		  LED_Off((led_T)i);
+    	  }
       }
 
       // Ejecutar la secuencia actual
@@ -259,6 +259,7 @@ int main(void)
               break;
       }
   }
+
   /* USER CODE END WHILE */
 
   /* USER CODE BEGIN 3 */
