@@ -1,7 +1,7 @@
-21:53:45 **** Incremental Build of configuration Debug for project AFP_3_App_1_4_Grupo_6_2024 ****
+23:42:06 **** Incremental Build of configuration Debug for project AFP_3_App_1_2_Grupo_6_2024 ****
 make -j8 all 
-arm-none-eabi-size  AFP_3_App_1_4_Grupo_6_2024.elf 
+arm-none-eabi-size  AFP_3_App_1_2_Grupo_6_2024.elf 
    text	   data	    bss	    dec	    hex	filename
-  12884	     12	   3460	  16356	   3fe4	AFP_3_App_1_4_Grupo_6_2024.elf
+   6496	     20	   1588	   8104	   1fa8	AFP_3_App_1_2_Grupo_6_2024.elf
 Finished building: default.size.stdout
  
