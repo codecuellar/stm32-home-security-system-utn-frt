@@ -38,7 +38,7 @@ Cada proyecto (`AFP1`, `AFP2`, y `AFP3`) está configurado en **STM32CubeIDE**. 
 
 ## Herramientas Utilizadas
 
-- **STM32CubeIDE**: IDE principal para la edición, compilación y carga de código en el microcontrolador STM32F429.
+- **STM32CubeIDE**: IDE principal para la edición, compilación y carga de código en el microcontrolador STM32F429ZI.
 - **Git y GitHub**: Control de versiones y colaboración en equipo.
 - **STM32CubeMX**: Para la generación inicial de código y configuraciones de periféricos.
 
@@ -49,7 +49,7 @@ Cada proyecto (`AFP1`, `AFP2`, y `AFP3`) está configurado en **STM32CubeIDE**. 
    - Selecciona `File > Import...`
    - Elige `General > Existing Projects into Workspace`
    - Selecciona la carpeta raíz donde están los proyectos y confirma.
-3. Compila y carga el proyecto en la placa STM32F429.
+3. Compila y carga el proyecto en la placa STM32F429ZI.
 
 ## Créditos
 
