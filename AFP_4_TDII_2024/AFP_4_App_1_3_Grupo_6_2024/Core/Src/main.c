@@ -23,8 +23,8 @@ de 300 ms.
 Secuencia 3: hace parpadear el LED1 con una alternancia de 100 ms, el LED2
 con una alternancia de 300 ms y el led3 con una alternancia de 600 ms.
 Secuencia 4: Hace parpadear simult´aneamente LED1 y LED3, mientras que
-LED2 lo har´a de manera inversa, con una alternancia de 150 ms. Mientras LED1
-y LED3 est´an encendidos, LED2 estara apagado y luego a la inversa.
+LED2 lo hara de manera inversa, con una alternancia de 150 ms. Mientras LED1
+y LED3 estan encendidos, LED2 estara apagado y luego a la inversa.
   ******************************************************************************
   */
 /* USER CODE END Header */

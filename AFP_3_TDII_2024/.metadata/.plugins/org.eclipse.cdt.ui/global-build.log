@@ -1,7 +1,49 @@
-23:42:06 **** Incremental Build of configuration Debug for project AFP_3_App_1_2_Grupo_6_2024 ****
+20:16:24 **** Build of configuration Debug for project AFP_3_App_1_1_Grupo_6_2024 ****
+make -j8 all 
+arm-none-eabi-size  AFP_3_App_1_1_Grupo_6_2024.elf 
+   text	   data	    bss	    dec	    hex	filename
+  12788	     12	   3452	  16252	   3f7c	AFP_3_App_1_1_Grupo_6_2024.elf
+Finished building: default.size.stdout
+ 
+20:16:39 **** Incremental Build of configuration Debug for project AFP_3_App_1_1_Grupo_6_2024 ****
+make -j8 all 
+arm-none-eabi-size  AFP_3_App_1_1_Grupo_6_2024.elf 
+   text	   data	    bss	    dec	    hex	filename
+  12788	     12	   3452	  16252	   3f7c	AFP_3_App_1_1_Grupo_6_2024.elf
+Finished building: default.size.stdout
+ 
+20:17:13 **** Build of configuration Debug for project AFP_3_App_1_2_Grupo_6_2024 ****
 make -j8 all 
 arm-none-eabi-size  AFP_3_App_1_2_Grupo_6_2024.elf 
    text	   data	    bss	    dec	    hex	filename
    6496	     20	   1588	   8104	   1fa8	AFP_3_App_1_2_Grupo_6_2024.elf
+Finished building: default.size.stdout
+ 
+20:17:50 **** Build of configuration Debug for project AFP_3_App_1_3_Grupo_6_2024 ****
+make -j8 all 
+arm-none-eabi-size  AFP_3_App_1_3_Grupo_6_2024.elf 
+   text	   data	    bss	    dec	    hex	filename
+  13548	     16	   3200	  16764	   417c	AFP_3_App_1_3_Grupo_6_2024.elf
+Finished building: default.size.stdout
+ 
+20:18:47 **** Incremental Build of configuration Debug for project AFP_3_App_1_2_Grupo_6_2024 ****
+make -j8 all 
+arm-none-eabi-size  AFP_3_App_1_2_Grupo_6_2024.elf 
+   text	   data	    bss	    dec	    hex	filename
+   6496	     20	   1588	   8104	   1fa8	AFP_3_App_1_2_Grupo_6_2024.elf
+Finished building: default.size.stdout
+ 
+20:19:23 **** Incremental Build of configuration Debug for project AFP_3_App_1_3_Grupo_6_2024 ****
+make -j8 all 
+arm-none-eabi-size  AFP_3_App_1_3_Grupo_6_2024.elf 
+   text	   data	    bss	    dec	    hex	filename
+  13548	     16	   3200	  16764	   417c	AFP_3_App_1_3_Grupo_6_2024.elf
+Finished building: default.size.stdout
+ 
+20:20:12 **** Build of configuration Debug for project AFP_3_App_1_4_Grupo_6_2024 ****
+make -j8 all 
+arm-none-eabi-size  AFP_3_App_1_4_Grupo_6_2024.elf 
+   text	   data	    bss	    dec	    hex	filename
+  12884	     12	   3460	  16356	   3fe4	AFP_3_App_1_4_Grupo_6_2024.elf
 Finished building: default.size.stdout
  
