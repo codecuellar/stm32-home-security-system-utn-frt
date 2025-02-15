@@ -12,6 +12,7 @@
 
 #include "stdint.h"
 #include "stdbool.h"  // Para el uso de bool en C
+#include "stm32f4xx_hal.h"
 
 // DefiniciÃ³n del tipo de dato para representar los LEDs
 typedef enum {

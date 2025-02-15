@@ -49,7 +49,7 @@ void activateSystem(void) {
 }
 
 void deactivateSystem(void) {
-    stopAlarm(); // Apagar la alarma
+	Alarm_Off(); // Apagar la alarma
     sendMessageBT("Sistema desactivado");
     commandAccepted();
 }

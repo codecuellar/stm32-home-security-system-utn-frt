@@ -18,23 +18,32 @@
 // Declarar extern los temporizadores si no están definidos aquí
 extern TIM_HandleTypeDef htim3;
 extern TIM_HandleTypeDef htim4;
-extern ADC_HandleTypeDef hadc1;  // Asegúrate de declarar el ADC
+extern TIM_HandleTypeDef htim5;
+extern TIM_HandleTypeDef htim9;
+extern TIM_HandleTypeDef htim10;
+extern TIM_HandleTypeDef htim11;
 
-extern uint32_t threshold;
+extern ADC_HandleTypeDef hadc1;
+
+
 extern system_status_t system_status;
-extern bool pir_timer;
-extern bool barrier_timer;
+uint32_t pir_timer = 0;
+uint32_t barrier_timer = 0;
 
+uint32_t threshold = 1000;  // Umbral de ejemplo, REVISAR ESTO
 uint16_t dutyCycle = 0;
 uint8_t increase = 0;
 uint16_t count_pwm = 0;
+
+extern ADC_HandleTypeDef hadc1;
+
 
 extern void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
     if (htim->Instance == TIM10) {
         if (__HAL_TIM_GET_AUTORELOAD(&htim10) == 29999) {
             HAL_TIM_Base_Stop_IT(&htim10);
             HAL_UART_AbortReceive_IT(&huart2);
-            default_configuration();
+            /*default_configuration() Nota de agustin: Comento hasta encontrar el propósito de esa funcion (que no está definida)*/
         }
         if (__HAL_TIM_GET_AUTORELOAD(&htim10) == 9999) {
             // Aquí puedes reemplazar la llamada al DS1307 con tu lógica de RTC o temporalización.
@@ -106,7 +115,6 @@ void HAL_TIM_PWM_PulseFinishedCallback(TIM_HandleTypeDef *htim) {
 
 	if (htim->Instance == TIM9) {
 		if (HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_3) == GPIO_PIN_SET && system_status.area_active) {
-			// ✅ Verificar si PB3 está disponible en la F429ZI
 			system_status.area_alarmed = true;
 			pir_timer = false;
 			check_alarms();

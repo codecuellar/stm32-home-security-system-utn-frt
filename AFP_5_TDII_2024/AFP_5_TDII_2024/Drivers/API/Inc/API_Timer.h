@@ -18,6 +18,9 @@ extern TIM_HandleTypeDef htim9;
 extern UART_HandleTypeDef huart2;
 extern ADC_HandleTypeDef hadc1;
 
+extern uint32_t pir_timer;
+extern uint32_t barrier_timer;
+
 
 
 #endif /* API_INC_API_TIMER_H_ */

@@ -30,19 +30,6 @@ bool magnetic_timer_active = false;
 //-------------------------------------------
 // Sección de comunicación UART/Bluetooth
 //-------------------------------------------
-void MX_USART2_UART_Init(void) {
-    // Configuración inicial de USART2
-    huart2.Instance = USART2;
-    huart2.Init.BaudRate = 9600;
-    huart2.Init.WordLength = UART_WORDLENGTH_8B;
-    huart2.Init.StopBits = UART_STOPBITS_1;
-    huart2.Init.Parity = UART_PARITY_NONE;
-    huart2.Init.Mode = UART_MODE_TX_RX;
-    huart2.Init.HwFlowCtl = UART_HWCONTROL_NONE;
-    huart2.Init.OverSampling = UART_OVERSAMPLING_16;
-
-    if (HAL_UART_Init(&huart2) != HAL_OK) Error_Handler();
-}
 
 void sendMessageBT(char *message) {
     // Envía mensajes por Bluetooth usando DMA (no bloqueante)
@@ -91,6 +78,9 @@ void initCommSystem(void) {
 }
 
 void MX_TIM_SENSOR_Init(void) {
+    // Primero desinicializa si ya estaba inicializado
+    HAL_TIM_Base_DeInit(&htim_sensor);
+
     // Configuración del timer (ej: TIM2)
     htim_sensor.Instance = TIM2;
     htim_sensor.Init.Prescaler = 1600 - 1; // Ajusta según tu reloj

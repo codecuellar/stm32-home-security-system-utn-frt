@@ -15,18 +15,28 @@
 
 // Definición de pines para el teclado matricial
 // Definición de pines para el teclado matricial
-#define PF12 GPIOF, GPIO_PIN_12
-#define PF13 GPIOF, GPIO_PIN_13
-#define PF14 GPIOF, GPIO_PIN_14
-#define PF15 GPIOF, GPIO_PIN_15
-#define PF10 GPIOF, GPIO_PIN_10
-#define PC0  GPIOC, GPIO_PIN_0
-#define PC2  GPIOC, GPIO_PIN_2
-#define PC3  GPIOC, GPIO_PIN_3
 
-#define KEYPAD_ROW_GPIO_PORT  {PF10, PC0, PC2, PC3}
+typedef struct {
+    GPIO_TypeDef* port;
+    uint16_t pin;
+} GPIO_Pin_t;
+
+GPIO_Pin_t row_ports[] = {
+    {GPIOF, GPIO_PIN_10},  // PF10
+    {GPIOC, GPIO_PIN_0},   // PC0
+    {GPIOC, GPIO_PIN_2},   // PC2
+    {GPIOC, GPIO_PIN_3}    // PC3
+};
+
+GPIO_Pin_t col_ports[] = {
+    {GPIOF, GPIO_PIN_12},  // PF12
+    {GPIOF, GPIO_PIN_13},  // PF13
+    {GPIOF, GPIO_PIN_14},  // PF14
+    {GPIOF, GPIO_PIN_15}   // PF15
+};
+
 #define KEYPAD_ROW_GPIO_PIN   {GPIO_PIN_10, GPIO_PIN_0, GPIO_PIN_2, GPIO_PIN_3}
-#define KEYPAD_COLUMN_GPIO_PORT {PF12, PF13, PF14, PF15}
+
 #define KEYPAD_COLUMN_GPIO_PIN  {GPIO_PIN_12, GPIO_PIN_13, GPIO_PIN_14, GPIO_PIN_15}
 
 keypad_t KeyPad;
@@ -40,28 +50,22 @@ void KeyPad_Init(void) {
     KeyPad.ColumnSize = 4;
     KeyPad.RowSize = 4;
 
-    uint16_t col_pins[] = KEYPAD_COLUMN_GPIO_PIN;
-    GPIO_TypeDef* col_ports[] = KEYPAD_COLUMN_GPIO_PORT;
-
     for (uint8_t i = 0; i < KeyPad.ColumnSize; i++) {
         gpio.Mode = GPIO_MODE_OUTPUT_PP;
         gpio.Pull = GPIO_NOPULL;
         gpio.Speed = GPIO_SPEED_FREQ_LOW;
-        gpio.Pin = col_pins[i];
-        HAL_GPIO_Init(col_ports[i], &gpio);
-        HAL_GPIO_WritePin(col_ports[i], col_pins[i], GPIO_PIN_SET); // Apagar columnas
+        gpio.Pin = col_ports[i].pin;  // Usar el pin de la estructura col_ports
+        HAL_GPIO_Init(col_ports[i].port, &gpio);  // Usar el puerto de la estructura col_ports
+        HAL_GPIO_WritePin(col_ports[i].port, col_ports[i].pin, GPIO_PIN_SET); // Apagar columnas
     }
 
     // Configurar las filas como entradas con pull-up
-    uint16_t row_pins[] = KEYPAD_ROW_GPIO_PIN;
-    GPIO_TypeDef* row_ports[] = KEYPAD_ROW_GPIO_PORT;
-
     for (uint8_t i = 0; i < KeyPad.RowSize; i++) {
         gpio.Mode = GPIO_MODE_INPUT;
         gpio.Pull = GPIO_PULLUP;
         gpio.Speed = GPIO_SPEED_FREQ_LOW;
-        gpio.Pin = row_pins[i];
-        HAL_GPIO_Init(row_ports[i], &gpio);
+        gpio.Pin = row_ports[i].pin;  // Usar el pin de la estructura row_ports
+        HAL_GPIO_Init(row_ports[i].port, &gpio);  // Usar el puerto de la estructura row_ports
     }
 
     keypad_active = true;
@@ -70,17 +74,14 @@ void KeyPad_Init(void) {
 // Función para escanear el teclado matricial
 uint16_t KeyPad_Scan(void) {
     uint16_t key = 0;
-    uint16_t col_pins[] = KEYPAD_COLUMN_GPIO_PIN;
-    GPIO_TypeDef* col_ports[] = KEYPAD_COLUMN_GPIO_PORT;
-    uint16_t row_pins[] = KEYPAD_ROW_GPIO_PIN;
-    GPIO_TypeDef* row_ports[] = KEYPAD_ROW_GPIO_PORT;
 
     for (uint8_t c = 0; c < KeyPad.ColumnSize; c++) {
         // Activar solo una columna
-        for (uint8_t i = 0; i < KeyPad.ColumnSize; i++)
-            HAL_GPIO_WritePin(col_ports[i], col_pins[i], GPIO_PIN_SET);
+        for (uint8_t i = 0; i < KeyPad.ColumnSize; i++) {
+            HAL_GPIO_WritePin(col_ports[i].port, col_ports[i].pin, GPIO_PIN_SET);
+        }
 
-        HAL_GPIO_WritePin(col_ports[c], col_pins[c], GPIO_PIN_RESET);
+        HAL_GPIO_WritePin(col_ports[c].port, col_ports[c].pin, GPIO_PIN_RESET);
 
         // Pequeño retardo no bloqueante
         delay_t debounce;
@@ -89,17 +90,17 @@ uint16_t KeyPad_Scan(void) {
 
         // Leer filas
         for (uint8_t r = 0; r < KeyPad.RowSize; r++) {
-            if (HAL_GPIO_ReadPin(row_ports[r], row_pins[r]) == GPIO_PIN_RESET) {
+            if (HAL_GPIO_ReadPin(row_ports[r].port, row_ports[r].pin) == GPIO_PIN_RESET) {
                 // Esperar debounce
                 delayInit(&debounce, 50);
                 while (!delayRead(&debounce));
 
-                if (HAL_GPIO_ReadPin(row_ports[r], row_pins[r]) == GPIO_PIN_RESET) {
-                    key |= (1 << c);
-                    key |= (1 << (r + 8));
+                if (HAL_GPIO_ReadPin(row_ports[r].port, row_ports[r].pin) == GPIO_PIN_RESET) {
+                    key |= (1 << c);          // Columna activa
+                    key |= (1 << (r + 8));    // Fila activa
 
                     // Esperar a que se suelte la tecla
-                    while (HAL_GPIO_ReadPin(row_ports[r], row_pins[r]) == GPIO_PIN_RESET) {
+                    while (HAL_GPIO_ReadPin(row_ports[r].port, row_ports[r].pin) == GPIO_PIN_RESET) {
                         delayInit(&debounce, 5);
                         while (!delayRead(&debounce));
                     }

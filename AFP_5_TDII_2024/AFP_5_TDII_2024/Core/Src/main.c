@@ -19,6 +19,23 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "string.h"
+#include "API_System.h"
+#include "API_Control.h"
+#include "API_Display.h"
+#include "API_Keypad.h"
+#include "API_Alarm.h"
+#include "API_PIR.h"
+#include "API_Magnetic.h"
+#include "API_Log.h"
+#include "API_Comm.h"
+#include "API_Feedback.h"
+#include "API_Debounce.h"
+#include "API_Delay.h"
+#include "API_GPIO.h"
+#include <string.h>
+#include <stdlib.h>
+#include <stdbool.h>
+#include "stm32f4xx_hal_tim.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -32,15 +49,25 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-
+// Definiciones
+#define INIT_DELAY_MS    500      // 500 ms de parpadeo durante la inicialización
+#define ALERT_DELAY_MS   30000    // 30 segundos de retardo antes de activar la alarma
+#define PASSWORD         "1234"   // Contraseña predefinida
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
-
+// Variables globales
+bool systemActive = false;
+bool alertTriggered = false;
+uint32_t alertStartTime = 0;
+char inputPassword[5] = "";
+uint8_t inputIndex = 0;
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
+ADC_HandleTypeDef hadc1;
+
 
 ETH_TxPacketConfig TxConfig;
 ETH_DMADescTypeDef  DMARxDscrTab[ETH_RX_DESC_CNT]; /* Ethernet Rx DMA Descriptors */
@@ -51,6 +78,15 @@ ETH_HandleTypeDef heth;
 I2C_HandleTypeDef hi2c1;
 
 RTC_HandleTypeDef hrtc;
+
+TIM_HandleTypeDef htim2;
+TIM_HandleTypeDef htim3;
+TIM_HandleTypeDef htim4;
+TIM_HandleTypeDef htim5;
+TIM_HandleTypeDef htim9;
+TIM_HandleTypeDef htim10;
+TIM_HandleTypeDef htim11;
+
 
 UART_HandleTypeDef huart2;
 UART_HandleTypeDef huart3;
@@ -63,19 +99,26 @@ PCD_HandleTypeDef hpcd_USB_OTG_FS;
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
-static void MX_GPIO_Init(void);
 static void MX_ETH_Init(void);
 static void MX_USART3_UART_Init(void);
 static void MX_USB_OTG_FS_PCD_Init(void);
 static void MX_I2C1_Init(void);
-static void MX_USART2_UART_Init(void);
+void MX_USART2_UART_Init(void);
 static void MX_RTC_Init(void);
+static void MX_TIM2_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+
+// Prototipos de funciones
+void iniciarSistema(void);
+void checkSensors(void);
+void checkKeypad(void);
+void activarAlarma(void);
+
 
 /* USER CODE END 0 */
 
@@ -97,6 +140,23 @@ int main(void)
 
   /* USER CODE BEGIN Init */
 
+  // Inicialización de módulos
+  initControl();
+  Display_Init();
+  KeyPad_Init();
+  Alarm_Init();
+  PIR_Init();
+  Magnetic_Init();
+  initCommSystem();
+  debounceFSM_init();
+
+
+  // Mostrar mensaje inicial
+  Display_Clear();
+  Display_Print("Sistema Inactivo", 0, 0);
+  logEvent("Sistema Inactivo");
+
+
   /* USER CODE END Init */
 
   /* Configure the system clock */
@@ -114,6 +174,7 @@ int main(void)
   MX_I2C1_Init();
   MX_USART2_UART_Init();
   MX_RTC_Init();
+  MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
 
   /* USER CODE END 2 */
@@ -135,6 +196,91 @@ int main(void)
   * @brief System Clock Configuration
   * @retval None
   */
+
+void iniciarSistema(void)
+{
+    for (int i = 0; i < 5; i++)
+    {
+        LED_Toggle(LD1);
+        feedback_sendAccepted("Iniciando sistema...");
+        Display_Print("Iniciando sistema...", 0, 10);
+        HAL_Delay(INIT_DELAY_MS);
+    }
+    LED_On(LD1);
+    feedback_sendAccepted("ESTADO ACTIVO");
+    Display_Clear();
+    Display_Print("ESTADO ACTIVO", 0, 0);
+    logEvent("Sistema Activado");
+    activateSystem();
+    systemActive = true;
+}
+
+void checkSensors(void)
+{
+    if (PIR_IsDetected())
+    {
+        feedback_sendRejected("Alerta: Movimiento");
+        Display_Print("Alerta: Movimiento", 0, 20);
+        logEvent("Movimiento detectado");
+        alertStartTime = HAL_GetTick();
+        alertTriggered = true;
+    }
+    if (Magnetic_IsDetected())
+    {
+        feedback_sendRejected("Alerta: Apertura");
+        Display_Print("Alerta: Apertura", 0, 30);
+        logEvent("Apertura detectada");
+        alertStartTime = HAL_GetTick();
+        alertTriggered = true;
+    }
+    if (alertTriggered && (HAL_GetTick() - alertStartTime >= ALERT_DELAY_MS))
+    {
+        activarAlarma();
+    }
+}
+
+void checkKeypad(void)
+{
+    char key = key_pad_get_char(100);
+    if (key != 0)
+    {
+        if (key == KEYPAD_VALUE_HASH)
+        {
+            if (feedback_matchPin(inputPassword, PASSWORD))
+            {
+                feedback_sendAccepted("ContraseÃ±a correcta");
+                Display_Print("Alarma desactivada", 0, 40);
+                logEvent("Alarma desactivada por usuario");
+                deactivateSystem();
+                alertTriggered = false;
+                inputIndex = 0;
+                memset(inputPassword, 0, sizeof(inputPassword));
+            }
+            else
+            {
+                feedback_sendRejected("ContraseÃ±a incorrecta");
+                Display_Print("Intentelo de nuevo", 0, 40);
+                inputIndex = 0;
+                memset(inputPassword, 0, sizeof(inputPassword));
+            }
+        }
+        else if (inputIndex < 4)
+        {
+            inputPassword[inputIndex++] = key;
+            inputPassword[inputIndex] = '\0';
+        }
+    }
+}
+
+void activarAlarma(void)
+{
+    feedback_sendRejected("ALARMA ACTIVADA");
+    Display_Print("ALARMA ACTIVADA", 0, 50);
+    logEvent("ALARMA ACTIVADA");
+    Alarm_On();
+}
+
+
 void SystemClock_Config(void)
 {
   RCC_OscInitTypeDef RCC_OscInitStruct = {0};
@@ -338,11 +484,56 @@ static void MX_RTC_Init(void)
 }
 
 /**
+  * @brief TIM2 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_TIM2_Init(void)
+{
+
+  /* USER CODE BEGIN TIM2_Init 0 */
+
+  /* USER CODE END TIM2_Init 0 */
+
+  TIM_ClockConfigTypeDef sClockSourceConfig = {0};
+  TIM_MasterConfigTypeDef sMasterConfig = {0};
+
+  /* USER CODE BEGIN TIM2_Init 1 */
+
+  /* USER CODE END TIM2_Init 1 */
+  htim2.Instance = TIM2;
+  htim2.Init.Prescaler = 1599;
+  htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
+  htim2.Init.Period = 999;
+  htim2.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+  htim2.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+  if (HAL_TIM_Base_Init(&htim2) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sClockSourceConfig.ClockSource = TIM_CLOCKSOURCE_INTERNAL;
+  if (HAL_TIM_ConfigClockSource(&htim2, &sClockSourceConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
+  sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
+  if (HAL_TIMEx_MasterConfigSynchronization(&htim2, &sMasterConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN TIM2_Init 2 */
+
+  /* USER CODE END TIM2_Init 2 */
+
+}
+
+/**
   * @brief USART2 Initialization Function
   * @param None
   * @retval None
   */
-static void MX_USART2_UART_Init(void)
+void MX_USART2_UART_Init(void)
 {
 
   /* USER CODE BEGIN USART2_Init 0 */
@@ -443,123 +634,7 @@ static void MX_USB_OTG_FS_PCD_Init(void)
   * @param None
   * @retval None
   */
-static void MX_GPIO_Init(void)
-{
-  GPIO_InitTypeDef GPIO_InitStruct = {0};
-/* USER CODE BEGIN MX_GPIO_Init_1 */
-/* USER CODE END MX_GPIO_Init_1 */
 
-  /* GPIO Ports Clock Enable */
-  __HAL_RCC_GPIOC_CLK_ENABLE();
-  __HAL_RCC_GPIOF_CLK_ENABLE();
-  __HAL_RCC_GPIOH_CLK_ENABLE();
-  __HAL_RCC_GPIOA_CLK_ENABLE();
-  __HAL_RCC_GPIOB_CLK_ENABLE();
-  __HAL_RCC_GPIOD_CLK_ENABLE();
-  __HAL_RCC_GPIOG_CLK_ENABLE();
-
-  /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4|GPIO_PIN_5, GPIO_PIN_RESET);
-
-  /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOB, LD1_Pin|Alarm_Pin|LD3_Pin|GPIO_PIN_4
-                          |GPIO_PIN_6|LD2_Pin, GPIO_PIN_RESET);
-
-  /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOF, KeypadF12_Pin|KeypadF13_Pin|KeypadF14_Pin|KeypadF15_Pin, GPIO_PIN_RESET);
-
-  /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOD, GPIO_PIN_11, GPIO_PIN_RESET);
-
-  /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(USB_PowerSwitchOn_GPIO_Port, USB_PowerSwitchOn_Pin, GPIO_PIN_RESET);
-
-  /*Configure GPIO pin : PC13 */
-  GPIO_InitStruct.Pin = GPIO_PIN_13;
-  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
-
-  /*Configure GPIO pin : Keypad_Pin */
-  GPIO_InitStruct.Pin = Keypad_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-  GPIO_InitStruct.Pull = GPIO_PULLUP;
-  HAL_GPIO_Init(Keypad_GPIO_Port, &GPIO_InitStruct);
-
-  /*Configure GPIO pins : KeypadC0_Pin KeypadC2_Pin KeypadC3_Pin */
-  GPIO_InitStruct.Pin = KeypadC0_Pin|KeypadC2_Pin|KeypadC3_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-  GPIO_InitStruct.Pull = GPIO_PULLUP;
-  HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
-
-  /*Configure GPIO pins : PA4 PA5 */
-  GPIO_InitStruct.Pin = GPIO_PIN_4|GPIO_PIN_5;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
-
-  /*Configure GPIO pins : LD1_Pin Alarm_Pin LD3_Pin PB4
-                           PB6 LD2_Pin */
-  GPIO_InitStruct.Pin = LD1_Pin|Alarm_Pin|LD3_Pin|GPIO_PIN_4
-                          |GPIO_PIN_6|LD2_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
-
-  /*Configure GPIO pins : KeypadF12_Pin KeypadF13_Pin KeypadF14_Pin KeypadF15_Pin */
-  GPIO_InitStruct.Pin = KeypadF12_Pin|KeypadF13_Pin|KeypadF14_Pin|KeypadF15_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(GPIOF, &GPIO_InitStruct);
-
-  /*Configure GPIO pin : PD11 */
-  GPIO_InitStruct.Pin = GPIO_PIN_11;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
-
-  /*Configure GPIO pin : USB_PowerSwitchOn_Pin */
-  GPIO_InitStruct.Pin = USB_PowerSwitchOn_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(USB_PowerSwitchOn_GPIO_Port, &GPIO_InitStruct);
-
-  /*Configure GPIO pin : USB_OverCurrent_Pin */
-  GPIO_InitStruct.Pin = USB_OverCurrent_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  HAL_GPIO_Init(USB_OverCurrent_GPIO_Port, &GPIO_InitStruct);
-
-  /*Configure GPIO pin : SENSOR_MAGNETIC_Pin */
-  GPIO_InitStruct.Pin = SENSOR_MAGNETIC_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
-  GPIO_InitStruct.Pull = GPIO_PULLUP;
-  HAL_GPIO_Init(SENSOR_MAGNETIC_GPIO_Port, &GPIO_InitStruct);
-
-  /*Configure GPIO pin : SENSOR_PIR_Pin */
-  GPIO_InitStruct.Pin = SENSOR_PIR_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
-  GPIO_InitStruct.Pull = GPIO_PULLDOWN;
-  HAL_GPIO_Init(SENSOR_PIR_GPIO_Port, &GPIO_InitStruct);
-
-  /*Configure GPIO pin : PB5 */
-  GPIO_InitStruct.Pin = GPIO_PIN_5;
-  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
-
-  /* EXTI interrupt init*/
-  HAL_NVIC_SetPriority(EXTI0_IRQn, 0, 0);
-  HAL_NVIC_EnableIRQ(EXTI0_IRQn);
-
-/* USER CODE BEGIN MX_GPIO_Init_2 */
-/* USER CODE END MX_GPIO_Init_2 */
-}
 
 /* USER CODE BEGIN 4 */
 
@@ -595,4 +670,19 @@ void assert_failed(uint8_t *file, uint32_t line)
      ex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
   /* USER CODE END 6 */
 }
+
+void MX_ADC1_Init(void) {
+    hadc1.Instance = ADC1;
+    hadc1.Init.ClockPrescaler = ADC_CLOCK_SYNC_PCLK_DIV4;
+    hadc1.Init.Resolution = ADC_RESOLUTION_12B;
+    hadc1.Init.ScanConvMode = DISABLE;
+    hadc1.Init.ContinuousConvMode = DISABLE;
+    hadc1.Init.DiscontinuousConvMode = DISABLE;
+    hadc1.Init.ExternalTrigConv = ADC_SOFTWARE_START;
+    hadc1.Init.DataAlign = ADC_DATAALIGN_RIGHT;
+    hadc1.Init.NbrOfConversion = 1;
+    HAL_ADC_Init(&hadc1);
+}
+
+
 #endif /* USE_FULL_ASSERT */

@@ -14,6 +14,8 @@
 #define ALARM_GPIO_PORT GPIOD
 #define ALARM_GPIO_PIN  GPIO_PIN_11
 
+bool alarma_activa = false;  // Inicialmente la alarma está desactivada
+
 void Alarm_Init(void) {
     GPIO_InitTypeDef GPIO_InitStruct = {0};
 
@@ -36,3 +38,10 @@ void Alarm_Off(void) {
     HAL_GPIO_WritePin(ALARM_GPIO_PORT, ALARM_GPIO_PIN, GPIO_PIN_RESET);  // Apaga la sirena
 }
 
+void check_alarms(void) {
+    if (alarma_activa) {  // Variable que indica si la alarma está activada
+    	Alarm_On();
+    } else {
+    	Alarm_Off();
+    }
+}
