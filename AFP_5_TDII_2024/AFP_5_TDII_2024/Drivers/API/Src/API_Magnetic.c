@@ -49,6 +49,7 @@ extern void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
 }
 
 // Manejador de interrupción para EXTI0
-void EXTI0_IRQHandler(void) {
+/*void EXTI0_IRQHandler(void) {
     HAL_GPIO_EXTI_IRQHandler(MAGNETIC_GPIO_PIN);
 }
+*/

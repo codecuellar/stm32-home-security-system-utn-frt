@@ -15,7 +15,7 @@
 #include "API_System.h"
 
 /* Variables y handles */
-UART_HandleTypeDef huart2;
+
 DMA_HandleTypeDef hdma_usart2_tx;
 TIM_HandleTypeDef htim_sensor; // Timer para retardos de sensores
 

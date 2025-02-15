@@ -11,10 +11,7 @@
 #include "stm32f4xx_hal.h"
 #include "stm32f4xx_hal_i2c.h"
 
-
-
-extern I2C_HandleTypeDef hi2c1;  // Definimos la estructura de I2C
-
+extern I2C_HandleTypeDef hi2c1;
 void MX_I2C1_Init(void); // Inicializa el I2C1
 
 

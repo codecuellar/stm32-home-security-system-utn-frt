@@ -21,6 +21,7 @@
 /* Declaración de variables globales */
 /*extern system_status_t system_status;*/
 /*extern system_config_t system_config;*/
+extern UART_HandleTypeDef huart2;  // solo está declarado, no definido
 
 /* Prototipos de funciones */
 void MX_USART2_UART_Init(void);

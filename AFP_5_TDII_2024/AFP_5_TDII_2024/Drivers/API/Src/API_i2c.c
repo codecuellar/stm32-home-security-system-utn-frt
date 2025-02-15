@@ -13,7 +13,8 @@
 #include <stdlib.h>
 #include "API_System.h"
 
-I2C_HandleTypeDef hi2c1;
+
+
 DMA_HandleTypeDef hdma_i2c1_rx;
 
 /* Inicialización de I2C1 */
@@ -33,64 +34,3 @@ void I2C1_Init(void) {
     }
 }
 
-/* Configuración de los pines GPIO y del periférico I2C */
-void HAL_I2C_MspInit(I2C_HandleTypeDef* i2cHandle) {
-    GPIO_InitTypeDef GPIO_InitStruct = {0};
-
-    if (i2cHandle->Instance == I2C1) {
-        /* Habilitar reloj de GPIOB */
-        __HAL_RCC_GPIOB_CLK_ENABLE();
-
-        /* Configurar PB6 (SCL) y PB7 (SDA) en modo I2C */
-        GPIO_InitStruct.Pin = GPIO_PIN_6 | GPIO_PIN_7;
-        GPIO_InitStruct.Mode = GPIO_MODE_AF_OD;
-        GPIO_InitStruct.Pull = GPIO_PULLUP;
-        GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
-        GPIO_InitStruct.Alternate = GPIO_AF4_I2C1;
-        HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
-
-        /* Habilitar reloj de I2C1 */
-        __HAL_RCC_I2C1_CLK_ENABLE();
-
-        /* Configuración del DMA para recepción I2C1 */
-        __HAL_RCC_DMA2_CLK_ENABLE();  // Adaptado para F429ZI
-
-        hdma_i2c1_rx.Instance = DMA2_Stream0;  // Cambio a DMA2 para F429ZI
-        hdma_i2c1_rx.Init.Channel = DMA_CHANNEL_1;
-        hdma_i2c1_rx.Init.Direction = DMA_PERIPH_TO_MEMORY;
-        hdma_i2c1_rx.Init.PeriphInc = DMA_PINC_DISABLE;
-        hdma_i2c1_rx.Init.MemInc = DMA_MINC_ENABLE;
-        hdma_i2c1_rx.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
-        hdma_i2c1_rx.Init.MemDataAlignment = DMA_MDATAALIGN_BYTE;
-        hdma_i2c1_rx.Init.Mode = DMA_NORMAL;
-        hdma_i2c1_rx.Init.Priority = DMA_PRIORITY_LOW;
-        hdma_i2c1_rx.Init.FIFOMode = DMA_FIFOMODE_DISABLE;
-
-        if (HAL_DMA_Init(&hdma_i2c1_rx) != HAL_OK) {
-            Error_Handler();
-        }
-
-        __HAL_LINKDMA(i2cHandle, hdmarx, hdma_i2c1_rx);
-
-        /* Configuración de interrupciones I2C1 */
-        HAL_NVIC_SetPriority(I2C1_EV_IRQn, 0, 0);
-        HAL_NVIC_EnableIRQ(I2C1_EV_IRQn);
-    }
-}
-
-/* De-inicialización de I2C1 */
-void HAL_I2C_MspDeInit(I2C_HandleTypeDef* i2cHandle) {
-    if (i2cHandle->Instance == I2C1) {
-        /* Deshabilitar el reloj de I2C1 */
-        __HAL_RCC_I2C1_CLK_DISABLE();
-
-        /* Reset de pines GPIO */
-        HAL_GPIO_DeInit(GPIOB, GPIO_PIN_6 | GPIO_PIN_7);
-
-        /* Deshabilitar DMA */
-        HAL_DMA_DeInit(i2cHandle->hdmarx);
-
-        /* Deshabilitar interrupciones */
-        HAL_NVIC_DisableIRQ(I2C1_EV_IRQn);
-    }
-}

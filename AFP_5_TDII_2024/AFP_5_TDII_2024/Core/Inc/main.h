@@ -57,10 +57,18 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
+#define Keypad_Pin GPIO_PIN_10
+#define Keypad_GPIO_Port GPIOF
 #define MCO_Pin GPIO_PIN_0
 #define MCO_GPIO_Port GPIOH
+#define KeypadC0_Pin GPIO_PIN_0
+#define KeypadC0_GPIO_Port GPIOC
 #define RMII_MDC_Pin GPIO_PIN_1
 #define RMII_MDC_GPIO_Port GPIOC
+#define KeypadC2_Pin GPIO_PIN_2
+#define KeypadC2_GPIO_Port GPIOC
+#define KeypadC3_Pin GPIO_PIN_3
+#define KeypadC3_GPIO_Port GPIOC
 #define RMII_REF_CLK_Pin GPIO_PIN_1
 #define RMII_REF_CLK_GPIO_Port GPIOA
 #define RMII_MDIO_Pin GPIO_PIN_2
@@ -73,6 +81,16 @@ void Error_Handler(void);
 #define RMII_RXD1_GPIO_Port GPIOC
 #define LD1_Pin GPIO_PIN_0
 #define LD1_GPIO_Port GPIOB
+#define Alarm_Pin GPIO_PIN_1
+#define Alarm_GPIO_Port GPIOB
+#define KeypadF12_Pin GPIO_PIN_12
+#define KeypadF12_GPIO_Port GPIOF
+#define KeypadF13_Pin GPIO_PIN_13
+#define KeypadF13_GPIO_Port GPIOF
+#define KeypadF14_Pin GPIO_PIN_14
+#define KeypadF14_GPIO_Port GPIOF
+#define KeypadF15_Pin GPIO_PIN_15
+#define KeypadF15_GPIO_Port GPIOF
 #define RMII_TXD1_Pin GPIO_PIN_13
 #define RMII_TXD1_GPIO_Port GPIOB
 #define LD3_Pin GPIO_PIN_14
@@ -99,10 +117,15 @@ void Error_Handler(void);
 #define TMS_GPIO_Port GPIOA
 #define TCK_Pin GPIO_PIN_14
 #define TCK_GPIO_Port GPIOA
+#define SENSOR_MAGNETIC_Pin GPIO_PIN_0
+#define SENSOR_MAGNETIC_GPIO_Port GPIOD
+#define SENSOR_MAGNETIC_EXTI_IRQn EXTI0_IRQn
 #define RMII_TX_EN_Pin GPIO_PIN_11
 #define RMII_TX_EN_GPIO_Port GPIOG
 #define RMII_TXD0_Pin GPIO_PIN_13
 #define RMII_TXD0_GPIO_Port GPIOG
+#define SENSOR_PIR_Pin GPIO_PIN_3
+#define SENSOR_PIR_GPIO_Port GPIOB
 #define LD2_Pin GPIO_PIN_7
 #define LD2_GPIO_Port GPIOB
 
