@@ -36,6 +36,8 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include "stm32f4xx_hal_tim.h"
+#include "ssd1306.h"
+#include "ssd1306_fonts.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -63,6 +65,8 @@ bool alertTriggered = false;
 uint32_t alertStartTime = 0;
 char inputPassword[5] = "";
 uint8_t inputIndex = 0;
+uint32_t lastCheckTime = 0;
+uint32_t lastKeypadTime = 0;
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
@@ -137,6 +141,7 @@ int main(void)
 
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
   HAL_Init();
+  MX_I2C1_Init();
 
   /* USER CODE BEGIN Init */
 
@@ -171,7 +176,7 @@ int main(void)
   MX_ETH_Init();
   MX_USART3_UART_Init();
   MX_USB_OTG_FS_PCD_Init();
-  MX_I2C1_Init();
+
   MX_USART2_UART_Init();
   MX_RTC_Init();
   MX_TIM2_Init();
@@ -184,7 +189,15 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
+	    if (HAL_GetTick() - lastCheckTime >= 100) {  // Revisar sensores cada 100ms
+	        checkSensors();
+	        lastCheckTime = HAL_GetTick();
+	    }
 
+	    if (HAL_GetTick() - lastKeypadTime >= 50) {  // Revisar teclado cada 50ms
+	        checkKeypad();
+	        lastKeypadTime = HAL_GetTick();
+	    }
     /* USER CODE BEGIN 3 */
   }
 

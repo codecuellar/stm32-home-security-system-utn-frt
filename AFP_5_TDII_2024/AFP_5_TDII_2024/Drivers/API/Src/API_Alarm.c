@@ -19,7 +19,7 @@ bool alarma_activa = false;  // Inicialmente la alarma está desactivada
 void Alarm_Init(void) {
     GPIO_InitTypeDef GPIO_InitStruct = {0};
 
-    __HAL_RCC_GPIOA_CLK_ENABLE(); 
+    __HAL_RCC_GPIOD_CLK_ENABLE();
 
     GPIO_InitStruct.Pin = ALARM_GPIO_PIN;
     GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;  // Salida push-pull
