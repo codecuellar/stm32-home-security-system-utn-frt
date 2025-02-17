@@ -122,6 +122,7 @@ void iniciarSistema(void);
 void checkSensors(void);
 void checkKeypad(void);
 void activarAlarma(void);
+void Display_ScrollText(const char* text, uint8_t x, uint8_t y, uint16_t delay_ms);
 
 
 /* USER CODE END 0 */
@@ -158,8 +159,12 @@ int main(void)
 
   // Mostrar mensaje inicial
   Display_Clear();
-  Display_Print("Sistema Inactivo", 0, 0);
-  logEvent("Sistema Inactivo");
+  Display_Print("Iniciando sistema...", 0, 0);
+  HAL_Delay(5000);
+  Display_Clear();
+  Display_Print("Sistema Activo", 0, 0);
+  logEvent("Sistema Activado");
+  systemActive = true;
 
 
   /* USER CODE END Init */
@@ -194,10 +199,10 @@ int main(void)
 	        lastCheckTime = HAL_GetTick();
 	    }
 
-	    if (HAL_GetTick() - lastKeypadTime >= 50) {  // Revisar teclado cada 50ms
-	        checkKeypad();
-	        lastKeypadTime = HAL_GetTick();
-	    }
+        if (alertTriggered && (HAL_GetTick() - lastKeypadTime >= 50)) {  // Revisar teclado solo si hay alerta
+            checkKeypad();
+            lastKeypadTime = HAL_GetTick();
+        }
     /* USER CODE BEGIN 3 */
   }
 
@@ -228,40 +233,42 @@ void iniciarSistema(void)
     systemActive = true;
 }
 
-void checkSensors(void)
-{
-    if (PIR_IsDetected())
-    {
-        feedback_sendRejected("Alerta: Movimiento");
-        Display_Print("Alerta: Movimiento", 0, 20);
-        logEvent("Movimiento detectado");
-        alertStartTime = HAL_GetTick();
-        alertTriggered = true;
-    }
-    if (Magnetic_IsDetected())
-    {
-        feedback_sendRejected("Alerta: Apertura");
-        Display_Print("Alerta: Apertura", 0, 30);
-        logEvent("Apertura detectada");
-        alertStartTime = HAL_GetTick();
-        alertTriggered = true;
-    }
-    if (alertTriggered && (HAL_GetTick() - alertStartTime >= ALERT_DELAY_MS))
-    {
-        activarAlarma();
+void checkSensors(void) {
+    static bool alarmaActivada = false;
+
+    if (!alarmaActivada) {
+        if (PIR_IsDetected() || Magnetic_IsDetected()) {
+            if (!alertTriggered) {
+                Display_Clear();
+                feedback_sendRejected("Alerta detectada");
+                Display_ScrollText("Alerta: Ingrese clave", 0, 0, 150);
+                logEvent("Alerta detectada");
+                alertStartTime = HAL_GetTick();
+                alertTriggered = true;
+            }
+        }
+
+        if (alertTriggered && ((HAL_GetTick() - alertStartTime) >= ALERT_DELAY_MS)) {
+            activarAlarma();
+            alarmaActivada = true;
+        }
     }
 }
+
+
+
+
 
 void checkKeypad(void)
 {
     char key = key_pad_get_char(100);
     if (key != 0)
     {
-        if (key == KEYPAD_VALUE_HASH)
+        if (key == '#') // Confirmar ingreso de clave
         {
             if (feedback_matchPin(inputPassword, PASSWORD))
             {
-                feedback_sendAccepted("ContraseÃ±a correcta");
+                feedback_sendAccepted("Contraseña correcta");
                 Display_Print("Alarma desactivada", 0, 40);
                 logEvent("Alarma desactivada por usuario");
                 deactivateSystem();
@@ -271,7 +278,7 @@ void checkKeypad(void)
             }
             else
             {
-                feedback_sendRejected("ContraseÃ±a incorrecta");
+                feedback_sendRejected("Contraseña incorrecta");
                 Display_Print("Intentelo de nuevo", 0, 40);
                 inputIndex = 0;
                 memset(inputPassword, 0, sizeof(inputPassword));
@@ -287,11 +294,41 @@ void checkKeypad(void)
 
 void activarAlarma(void)
 {
+	Display_Clear();  // Limpiar la pantalla antes de mostrar el mensaje
     feedback_sendRejected("ALARMA ACTIVADA");
     Display_Print("ALARMA ACTIVADA", 0, 50);
     logEvent("ALARMA ACTIVADA");
     Alarm_On();
+
+    // Mantener el mensaje en pantalla
+        while (1) {
+            HAL_Delay(500);  // Mantener el bucle activo
+        }
 }
+
+
+void Display_ScrollText(const char* text, uint8_t x, uint8_t y, uint16_t delay_ms) {
+    uint8_t len = strlen(text);
+    char buffer[20];  // Tamaño ajustado según tu pantalla
+
+    while (1) {  // Bucle infinito para desplazamiento continuo
+        for (int8_t i = sizeof(buffer) - 1; i >= -len; i--) {
+            memset(buffer, ' ', sizeof(buffer));  // Llenar el buffer con espacios
+
+            // Copiar el texto al buffer en la posición adecuada
+            for (uint8_t j = 0; j < len; j++) {
+                if ((i + j) >= 0 && (i + j) < sizeof(buffer)) {
+                    buffer[i + j] = text[j];
+                }
+            }
+
+            Display_Clear();  // Limpiar pantalla en cada ciclo
+            Display_Print(buffer, x, y);  // Imprimir buffer desplazado
+            HAL_Delay(delay_ms);  // Controlar la velocidad del scroll
+        }
+    }
+}
+
 
 
 void SystemClock_Config(void)
@@ -573,6 +610,8 @@ void MX_USART2_UART_Init(void)
   /* USER CODE END USART2_Init 2 */
 
 }
+
+
 
 /**
   * @brief USART3 Initialization Function

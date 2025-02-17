@@ -42,14 +42,17 @@ bool PIR_IsDetected(void) {
 }
 
 // Callback de interrupción (se ejecuta cuando el PIR detecta movimiento)
-// extern void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
-    //if (GPIO_Pin == PIR_GPIO_PIN) {
-      //  pirDetected = true; // Se ha detectado movimiento
-    //}
-//}
-
+/*void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
+    if (GPIO_Pin == PIR_GPIO_PIN) {
+      pirDetected = true; // Se ha detectado movimiento
+    }
+}
+*/
 // Manejador de interrupción para EXTI3 (ajustar según el pin usado)
 void EXTI3_IRQHandler(void) {
-    HAL_GPIO_EXTI_IRQHandler(PIR_GPIO_PIN);
+    if (__HAL_GPIO_EXTI_GET_IT(PIR_GPIO_PIN) != RESET) {  // Verificar si la interrupción es del pin correcto
+        __HAL_GPIO_EXTI_CLEAR_IT(PIR_GPIO_PIN);  // Limpiar la bandera de interrupción
+        pirDetected = true;  // Actualizar la bandera de detección
+    }
 }
 
