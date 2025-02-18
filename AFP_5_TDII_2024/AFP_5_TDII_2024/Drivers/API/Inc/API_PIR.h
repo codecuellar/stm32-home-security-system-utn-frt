@@ -18,7 +18,7 @@
 // Prototipos de funciones
 void PIR_Init(void);       // Inicializa el sensor PIR y la interrupción
 bool PIR_IsDetected(void); // Devuelve true si se detectó movimiento
-
+void resetPIR(void);
 extern void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin);
 
 

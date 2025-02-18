@@ -16,6 +16,8 @@ void Alarm_Off(void);
 // Declaración de la función check_alarms
 void check_alarms(void);
 
+void set_alarma_estado(bool estado);
+
 extern bool alarma_activa;
 
 

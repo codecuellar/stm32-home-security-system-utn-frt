@@ -10,6 +10,8 @@
 #include "stm32f4xx_hal.h"
 #include <stdlib.h>
 #include "API_System.h"
+#include "API_Log.h"
+
 
 #define ALARM_GPIO_PORT GPIOD
 #define ALARM_GPIO_PIN  GPIO_PIN_11
@@ -31,6 +33,7 @@ void Alarm_Init(void) {
 }
 
 void Alarm_On(void) {
+	logEvent("Activando alarma...");  // ← Para ver si se llama antes de los 30s
     HAL_GPIO_WritePin(ALARM_GPIO_PORT, ALARM_GPIO_PIN, GPIO_PIN_SET);  // Activa la sirena
 }
 
@@ -39,9 +42,16 @@ void Alarm_Off(void) {
 }
 
 void check_alarms(void) {
-    if (alarma_activa) {  // Variable que indica si la alarma está activada
-    	Alarm_On();
+    if (alarma_activa) {
+        Alarm_On();
     } else {
-    	Alarm_Off();
+        Alarm_Off();
     }
 }
+
+
+
+void set_alarma_estado(bool estado) {
+    alarma_activa = estado;
+}
+

@@ -134,7 +134,7 @@ uint16_t KeyPad_WaitForKey(uint32_t Timeout_ms) {
 void buzz() {
     HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4, GPIO_PIN_SET);
     delay_t buzz_delay;
-    delayInit(&buzz_delay, 20);
+    delayInit(&buzz_delay, 50);
     while (!delayRead(&buzz_delay));
     HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4, GPIO_PIN_RESET);
 }

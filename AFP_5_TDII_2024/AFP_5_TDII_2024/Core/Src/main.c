@@ -53,36 +53,44 @@
 /* USER CODE BEGIN PD */
 // Definiciones
 #define INIT_DELAY_MS    500      // 500 ms de parpadeo durante la inicialización
-#define ALERT_DELAY_MS   30000    // 30 segundos de retardo antes de activar la alarma
+#define ALERT_DELAY_MS   10000    // 10 segundos de retardo antes de activar la alarma
 #define PASSWORD         "1234"   // Contraseña predefinida
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
 // Variables globales
-bool systemActive = false;
-bool alertTriggered = false;
+bool systemActive = false; //indica que el sistema esta activo
+bool alertTriggered = false; // indica que se a detectado una alerta
+bool alarmaActivada = false;
+bool sensorsoff= false; // variable que controla la pantalla no muestre alertaas  una vez la alarma se active
+
 uint32_t alertStartTime = 0;
 char inputPassword[5] = "";
 uint8_t inputIndex = 0;
-uint32_t lastCheckTime = 0;
-uint32_t lastKeypadTime = 0;
+
+char tecla;
+int intpermit = 3; //intentos permitidos
+int intentos = 0; //intentos realizados
+int alarmainicio = 0; // variable que controla que solo se inicie el contador una vez y no varias por señales de otros sensores
+
+
+// variables para el loop de parpadeo del led azul  al encender y apagar
+uint8_t continicio = 0;
+bool contfin = false;
+
+delay_t delay1;
+
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
 ADC_HandleTypeDef hadc1;
-
-
 ETH_TxPacketConfig TxConfig;
 ETH_DMADescTypeDef  DMARxDscrTab[ETH_RX_DESC_CNT]; /* Ethernet Rx DMA Descriptors */
 ETH_DMADescTypeDef  DMATxDscrTab[ETH_TX_DESC_CNT]; /* Ethernet Tx DMA Descriptors */
-
 ETH_HandleTypeDef heth;
-
 I2C_HandleTypeDef hi2c1;
-
 RTC_HandleTypeDef hrtc;
-
 TIM_HandleTypeDef htim2;
 TIM_HandleTypeDef htim3;
 TIM_HandleTypeDef htim4;
@@ -94,7 +102,6 @@ TIM_HandleTypeDef htim11;
 
 UART_HandleTypeDef huart2;
 UART_HandleTypeDef huart3;
-
 PCD_HandleTypeDef hpcd_USB_OTG_FS;
 
 /* USER CODE BEGIN PV */
@@ -110,6 +117,8 @@ static void MX_I2C1_Init(void);
 void MX_USART2_UART_Init(void);
 static void MX_RTC_Init(void);
 static void MX_TIM2_Init(void);
+void SistemaOFF(void);
+
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -119,10 +128,14 @@ static void MX_TIM2_Init(void);
 
 // Prototipos de funciones
 void iniciarSistema(void);
+void reiniciarSistema(void);
 void checkSensors(void);
-void checkKeypad(void);
 void activarAlarma(void);
-void Display_ScrollText(const char* text, uint8_t x, uint8_t y, uint16_t delay_ms);
+void checkKeypad(void);
+void desactivarAlarma(void);
+void mostrarAlerta(const char* mensaje);
+void bloquearpad(void);
+//void Display_ScrollText(const char* text, uint8_t x, uint8_t y, uint16_t delay_ms);
 
 
 /* USER CODE END 0 */
@@ -155,16 +168,15 @@ int main(void)
   Magnetic_Init();
   initCommSystem();
   debounceFSM_init();
-
-
+  delayInit(&delay1, 500);
+  /*
   // Mostrar mensaje inicial
   Display_Clear();
   Display_Print("Iniciando sistema...", 0, 0);
   HAL_Delay(5000);
-  Display_Clear();
-  Display_Print("Sistema Activo", 0, 0);
-  logEvent("Sistema Activado");
-  systemActive = true;
+  Display_Clear();*/
+
+
 
 
   /* USER CODE END Init */
@@ -191,20 +203,25 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  while (1)
-  {
-    /* USER CODE END WHILE */
-	    if (HAL_GetTick() - lastCheckTime >= 100) {  // Revisar sensores cada 100ms
-	        checkSensors();
-	        lastCheckTime = HAL_GetTick();
-	    }
+  while (1) {
+      // Verificar si el sistema está inactivo y se presiona el botón
+      if (!systemActive && readButton_GPIO()) {
+          iniciarSistema();
+          if (systemActive) {
+              Display_Clear();
+              Display_Print("ESTADO ACTIVO", 0, 0);
+              LED_On(LD1); // Encender LED verde
+              logEvent("Sistema Activado");
+              systemActive = true;
+          }
+      }
 
-        if (alertTriggered && (HAL_GetTick() - lastKeypadTime >= 50)) {  // Revisar teclado solo si hay alerta
-            checkKeypad();
-            lastKeypadTime = HAL_GetTick();
-        }
-    /* USER CODE BEGIN 3 */
+      // Verificar sensores si el sistema está activo
+      if (systemActive && !sensorsoff) {
+          checkSensors();
+      }
   }
+
 
 
   /* USER CODE END 3 */
@@ -215,99 +232,174 @@ int main(void)
   * @retval None
   */
 
-void iniciarSistema(void)
-{
-    for (int i = 0; i < 5; i++)
-    {
-        LED_Toggle(LD1);
-        feedback_sendAccepted("Iniciando sistema...");
-        Display_Print("Iniciando sistema...", 0, 10);
-        HAL_Delay(INIT_DELAY_MS);
-    }
-    LED_On(LD1);
-    feedback_sendAccepted("ESTADO ACTIVO");
+void iniciarSistema(void) {
+    alarmainicio = 0;
+    intentos = 0;
     Display_Clear();
-    Display_Print("ESTADO ACTIVO", 0, 0);
-    logEvent("Sistema Activado");
-    activateSystem();
-    systemActive = true;
+    Display_Print("Iniciando Sist...", 0, 0);
+    feedback_sendAccepted("Iniciando sistema...");
+    logEvent("Sistema iniciando");
+
+    int continicio = 0;
+    bool contfin = false;
+    while (!contfin) {
+        if (delayRead(&delay1)) {
+            LED_Toggle(LD2); // Toggle LED Azul
+            continicio++;
+
+            if (continicio >= 8) { // 4 ON + 4 OFF = 8 cambios
+                contfin = true;
+                LED_Off(LD2); // Apagar LED Azul
+                systemActive = true; // Activar el sistema
+                feedback_sendAccepted("ESTADO ACTIVO");
+                logEvent("Sistema Activado");
+            }
+        }
+    }
 }
 
 void checkSensors(void) {
-    static bool alarmaActivada = false;
+    static bool PIR_anterior = false;
+    static bool magnetico_anterior = false;
 
-    if (!alarmaActivada) {
-        if (PIR_IsDetected() || Magnetic_IsDetected()) {
-            if (!alertTriggered) {
-                Display_Clear();
-                feedback_sendRejected("Alerta detectada");
-                Display_ScrollText("Alerta: Ingrese clave", 0, 0, 150);
-                logEvent("Alerta detectada");
-                alertStartTime = HAL_GetTick();
-                alertTriggered = true;
-            }
-        }
+    bool PIR = PIR_IsDetected();       // Leer estado del PIR desde driver
+    bool magnetico = Magnetic_IsDetected(); // Leer estado del sensor magnético desde driver
 
-        if (alertTriggered && ((HAL_GetTick() - alertStartTime) >= ALERT_DELAY_MS)) {
-            activarAlarma();
-            alarmaActivada = true;
-        }
+    // Detectar flanco ascendente en PIR (cambio de 0 -> 1)
+    if (PIR && !PIR_anterior) {
+        Display_Clear();
+        Display_Print("Alerta por mov", 0, 0);
+        feedback_sendRejected("Alerta por mov");
+        logEvent("Alerta por movimiento");
+        alertStartTime = HAL_GetTick();
+        alertTriggered = true;
+        alarmainicio++;
+    }
+
+    // Detectar flanco ascendente en sensor magnético (cambio de 0 -> 1)
+    if (magnetico && !magnetico_anterior) {
+        Display_Clear();
+        Display_Print("Alerta por apertura", 0, 0);
+        feedback_sendRejected("Alerta por apertura");
+        logEvent("Alerta por apertura");
+        alertStartTime = HAL_GetTick();
+        alertTriggered = true;
+        alarmainicio++;
+    }
+
+    PIR_anterior = PIR;
+    magnetico_anterior = magnetico;
+
+    if ((alertTriggered && (HAL_GetTick() - alertStartTime >= ALERT_DELAY_MS)) || intentos >= intpermit) {
+        activarAlarma();
+        alertTriggered = false;
+    }
+
+    if (alertTriggered) {
+        checkKeypad();
     }
 }
 
 
 
+void checkKeypad(void) {
+    tecla = key_pad_get_char(100);
+    if (tecla != 0) {
+    	buzz(); // Feedback audible con función del driver
 
-
-void checkKeypad(void)
-{
-    char key = key_pad_get_char(100);
-    if (key != 0)
-    {
-        if (key == '#') // Confirmar ingreso de clave
-        {
-            if (feedback_matchPin(inputPassword, PASSWORD))
-            {
-                feedback_sendAccepted("Contraseña correcta");
-                Display_Print("Alarma desactivada", 0, 40);
-                logEvent("Alarma desactivada por usuario");
-                deactivateSystem();
-                alertTriggered = false;
-                inputIndex = 0;
-                memset(inputPassword, 0, sizeof(inputPassword));
+        if (tecla == '#') { // Tecla # para confirmar
+            inputPassword[inputIndex] = '\0';
+            if (strcmp(inputPassword, PASSWORD) == 0) {
+                desactivarAlarma();
+            } else {
+                Display_Clear();
+                Display_Print("     CODIGO     ", 0, 0);
+                Display_Print("   INCORRECTO   ", 0, 10);
+                feedback_sendRejected("Clave incorrecta");
+                intentos++;
+                if (intentos >= intpermit) {
+                    Display_Clear();
+                    Display_Print("    TECLADO     ", 0, 0);
+                    Display_Print("   BLOQUEADO   ", 0, 10);
+                    HAL_Delay(3000);
+                    alertTriggered = false;
+                }
             }
-            else
-            {
-                feedback_sendRejected("Contraseña incorrecta");
-                Display_Print("Intentelo de nuevo", 0, 40);
-                inputIndex = 0;
-                memset(inputPassword, 0, sizeof(inputPassword));
-            }
-        }
-        else if (inputIndex < 4)
-        {
-            inputPassword[inputIndex++] = key;
+            inputIndex = 0; // Reiniciar índice
+        } else if (inputIndex < 4) {
+            inputPassword[inputIndex++] = tecla;
             inputPassword[inputIndex] = '\0';
         }
     }
 }
 
-void activarAlarma(void)
-{
-	Display_Clear();  // Limpiar la pantalla antes de mostrar el mensaje
+
+void activarAlarma(void) {
+    Display_Clear();
+    Display_Print("     ALARMA   ", 0, 0);
+    Display_Print("    ACTIVADA    ", 0, 10);
     feedback_sendRejected("ALARMA ACTIVADA");
-    Display_Print("ALARMA ACTIVADA", 0, 50);
     logEvent("ALARMA ACTIVADA");
     Alarm_On();
-
-    // Mantener el mensaje en pantalla
-        while (1) {
-            HAL_Delay(500);  // Mantener el bucle activo
-        }
+    sensorsoff = true; // Desactivar sensores
+    alarmaActivada = true;
+    while (alertTriggered) {  // 🔹 Mantiene el bucle hasta que se ingrese la clave correcta
+        checkKeypad();  // 🔹 Permite ingresar la clave incluso con la alarma encendida
+    }
 }
 
+void desactivarAlarma(void) {
+    Display_Clear();
+    Display_Print("     ALARMA     ", 0, 0);
+    Display_Print("   DESACTIVADA   ", 0, 10);
+    feedback_sendAccepted("ALARMA DESACTIVADA");
+    logEvent("ALARMA DESACTIVADA");
+    LED_Off(LD3); // Apagar LED rojo
+    Alarm_Off(); // Apagar la alarma
+    alertTriggered = false;
+    inputIndex = 0;
+    systemActive = false;
+    HAL_Delay(3000);
+    SistemaOFF();
+}
 
-void Display_ScrollText(const char* text, uint8_t x, uint8_t y, uint16_t delay_ms) {
+void mostrarAlerta(const char* mensaje) {
+    LED_Off(LD1); // Apagar LED verde
+    LED_On(LD3); // Encender LED rojo
+
+    Display_Clear();
+    Display_Print((char *)mensaje, 0, 0);  // Mostrar mensaje en el OLED con cast
+
+    alarmainicio++;
+    if (alarmainicio == 1) { // Tomar el tiempo solo una vez
+        alertStartTime = HAL_GetTick();
+        alertTriggered = true;
+    }
+}
+void SistemaOFF(void) {
+    LED_Off(LD1);
+    LED_Off(LD3);
+    Display_Clear();
+    Display_Print("Apagando Sist...", 0, 0);
+
+    int continicio = 0;
+    bool contfin = false;
+    while (!contfin) {
+        if (delayRead(&delay1)) {
+            LED_Toggle(LD2); // Toggle LED Azul
+            continicio++;
+
+            if (continicio >= 8) { // 4 ON + 4 OFF = 8 cambios
+                contfin = true;
+                LED_Off(LD2); // Apagar LED Azul
+            }
+        }
+    }
+    LED_Off(LD2);
+    Display_Clear();
+}
+
+/*void Display_ScrollText(const char* text, uint8_t x, uint8_t y, uint16_t delay_ms) {
     uint8_t len = strlen(text);
     char buffer[20];  // Tamaño ajustado según tu pantalla
 
@@ -327,7 +419,7 @@ void Display_ScrollText(const char* text, uint8_t x, uint8_t y, uint16_t delay_m
             HAL_Delay(delay_ms);  // Controlar la velocidad del scroll
         }
     }
-}
+}*/
 
 
 

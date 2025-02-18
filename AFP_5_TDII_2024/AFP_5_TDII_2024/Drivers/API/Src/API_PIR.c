@@ -34,12 +34,19 @@ void PIR_Init(void) {
 
 // Función que devuelve si se ha detectado movimiento
 bool PIR_IsDetected(void) {
-    if (pirDetected) {
-        pirDetected = false;  // Reseteamos la bandera
+    static bool alreadyDetected = false;
+
+    if (pirDetected && !alreadyDetected) {
+        alreadyDetected = true;  // Bloquea futuras detecciones hasta reset
         return true;
     }
     return false;
 }
+
+void resetPIR(void) {
+    pirDetected = false;
+}
+
 
 // Callback de interrupción (se ejecuta cuando el PIR detecta movimiento)
 /*void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
