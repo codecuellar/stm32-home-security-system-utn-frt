@@ -1,0 +1,6 @@
+../Drivers/API/Src/API_GPIO.c:35:6:Turn_On	6
+../Drivers/API/Src/API_GPIO.c:64:6:Turn_Off	6
+../Drivers/API/Src/API_GPIO.c:92:6:LED_Toggle	5
+../Drivers/API/Src/API_GPIO.c:112:16:readButton_GPIO	1
+../Drivers/API/Src/API_GPIO.c:118:13:readPIR_GPIO	1
+../Drivers/API/Src/API_GPIO.c:123:13:readMag_GPIO	1

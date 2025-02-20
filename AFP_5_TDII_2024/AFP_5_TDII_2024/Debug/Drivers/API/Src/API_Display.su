@@ -1,0 +1,4 @@
+../Drivers/API/Src/API_Display.c:15:6:Display_Init	8	static
+../Drivers/API/Src/API_Display.c:21:6:Display_Clear	8	static
+../Drivers/API/Src/API_Display.c:26:6:Display_Print	24	static
+../Drivers/API/Src/API_Display.c:32:6:Display_Update	8	static
