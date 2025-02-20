@@ -56,7 +56,7 @@
 
 
 char tecla;  // tecla del pad 4x4
-char inputPassword[5] = "";
+char inputPassword[5] = ""; // Almacena la contraseña ingresada por el usuario (4 dígitos + carácter nulo)
 
 
 
