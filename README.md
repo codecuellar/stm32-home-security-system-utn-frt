@@ -10,7 +10,7 @@ El repositorio está organizado en carpetas para facilitar el acceso a cada part
 - `AFP2_TDII_Grupo6`: Segundo trabajo práctico, donde comenzamos con los drivers de funciones.  
 - `AFP3_TDII_Grupo6`: Tercer trabajo práctico, que añade funcionalidades avanzadas y configuraciones adicionales, específicamente funciones no bloqueantes.  
 - `AFP4_TDII_Grupo6`: Cuarto trabajo práctico, desarrollo de un sistema anti-rebote para pulsadores basado en una Máquina de Estados Finitos (MEF).  
-
+- `AFP5_TDII_Grupo6`: Quinto trabajo práctico y proyecto final, implementación de un sistema de seguridad para detección de intrusos utilizando sensores PIR, final de carrera, y un módulo Bluetooth.
 Cada carpeta incluye su propio código fuente y configuraciones específicas para cada etapa del proyecto.  
 
 ## Descripción de Funcionalidades  
@@ -51,6 +51,79 @@ En el cuarto trabajo práctico, desarrollamos un sistema anti-rebote para pulsad
 #### Aplicaciones desarrolladas:  
 - **App 1.1**: Secuencia simple sin interacción.  
 - **App 1.2 - App 1.4**: Implementación completa del sistema anti-rebote, manteniendo las secuencias de LEDs y lógica no bloqueante.  
+
+### 4. Sistema de Seguridad con Detección de Intrusos
+
+En el quinto trabajo práctico (AFP5), implementamos un Sistema de Seguridad para Detección de Intrusos utilizando una placa STM32 NUCLEO-F429ZI. Este sistema integra sensores PIR para detectar movimiento, un sensor magnético (reemplazado por un final de carrera) para monitorear la apertura de puertas o ventanas, y un módulo Bluetooth (HC-05) para la comunicación con dispositivos externos.
+
+#### Características del Sistema
+- **Detección de Intrusos**:
+
+    Sensor PIR (SR-501): Detecta movimiento en un rango de 3 a 7 metros.
+
+    Final de Carrera: Reemplaza al sensor magnético para detectar aperturas de puertas o ventanas.
+
+- **Interfaz de Usuario**:
+
+    Teclado Matricial 4x4: Permite al usuario ingresar un código de seguridad para desactivar la alarma.
+
+    Display OLED 128x32: Muestra mensajes de estado y alertas en tiempo real.
+
+    LEDs Indicadores: LED azul (inicialización), LED verde (monitoreo activo), LED rojo (alarma activa).
+
+- **Comunicación Bluetooth**:
+
+    Módulo HC-05: Permite la activación/desactivación remota del sistema mediante una aplicación móvil.
+
+- **Alarma Sonora**:
+
+    Sirena de 12V: Se activa cuando se detecta una intrusión y el usuario no desactiva el sistema en 30 segundos.
+
+#### Funcionamiento del Sistema
+El sistema opera mediante una Máquina de Estados Finitos (MEF) con los siguientes estados:
+
+- **INICIALIZACIÓN:**
+
+    El sistema se prepara para el monitoreo, mostrando un mensaje de inicio en el display OLED.
+
+    El LED azul parpadea indicando que el sistema está en espera.
+
+- **ESTADO ACTIVO:**
+
+    El sistema monitorea los sensores PIR y magnético.
+
+    Si se detecta movimiento o apertura de puerta, se muestra un mensaje de alerta en el display y se activa un contador de 30 segundos.
+
+    El LED verde permanece encendido indicando que el sistema está activo.
+
+- **ALARMA:**
+
+    Si el usuario no desactiva el sistema en 30 segundos, se activa la sirena y el LED rojo parpadea.
+
+    El usuario debe ingresar el código correcto en el teclado matricial para desactivar la alarma.
+
+    Si el usuario falla tres veces, el teclado se bloquea y la sirena se activa automáticamente.
+
+- **Módulos de Software Desarrollados**
+Módulo de Inicialización: Configuración de periféricos como GPIO, UART, I2C y el display OLED.
+
+Módulo de Control del Sistema (MEF): Implementa la Máquina de Estados Finitos que gestiona los estados del sistema.
+
+Módulo de Monitoreo de Sensores: Lee los sensores PIR y magnético para detectar intrusiones.
+
+Módulo de Gestión de Alertas: Muestra mensajes de alerta en el display y activa la sirena.
+
+Módulo de Teclado: Gestiona la entrada del usuario a través del teclado matricial 4x4.
+
+Módulo de Comunicación Bluetooth: Permite la comunicación con dispositivos externos mediante Bluetooth.
+
+Módulo de Retardos No Bloqueantes: Controla el tiempo de las transiciones y acciones en el sistema.
+
+Módulo de Control de LEDs: Gestiona los LEDs que indican el estado del sistema.
+
+Módulo de Registro de Eventos: Registra eventos importantes como alertas de sensores o intentos fallidos de contraseña.
+
+Módulo de Reinicio del Sistema: Permite reiniciar el sistema manualmente.
 
 ## Herramientas Utilizadas  
 
