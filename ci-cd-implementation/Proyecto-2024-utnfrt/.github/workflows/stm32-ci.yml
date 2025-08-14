@@ -23,7 +23,8 @@ jobs:
 
       # 3. Compilar firmware
       - name: Build firmware
-        run: make all
+        run: ls -R
+        # run: make all (este falló)
 
       # 4. Generar archivo .bin
       - name: Generate .bin
