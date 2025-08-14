@@ -93,10 +93,3 @@ warn-no-linker-script-specified:
 .PHONY: all clean dependents main-build fail-specified-linker-script-missing warn-no-linker-script-specified
 
 -include ../makefile.targets
-
-
-# --- Mis adiciones personalizadas para CI/CD ---
-bin: $(EXECUTABLES)
-	@echo 'Generando archivo binario (.bin)...'
-	arm-none-eabi-objcopy -O binary "$<" "$(basename $<).bin"
-	@echo 'Archivo .bin generado exitosamente.'

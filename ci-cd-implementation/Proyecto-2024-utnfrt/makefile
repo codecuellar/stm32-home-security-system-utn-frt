@@ -6,7 +6,7 @@ BUILD_DIR = Debug
 # Este comando ahora se ejecutará directamente desde el workflow.
 all:
 	@echo "🔨 Compilando firmware desde el Makefile de CubeIDE..."
-	make -j$(nproc)
+	make -C Proyecto-2024-utnfrt/Debug
 
 # Limpieza
 clean:
@@ -15,4 +15,4 @@ clean:
 
 # Genera el .bin usando el compilador del entorno, no una ruta fija.
 bin:
-	arm-none-eabi-objcopy -O binary "$(PROJECT_NAME).elf" "$(PROJECT_NAME).bin"
+	arm-none-eabi-objcopy -O binary "Proyecto-2024-utnfrt/Debug/$(PROJECT_NAME).elf" "Proyecto-2024-utnfrt/Debug/$(PROJECT_NAME).bin"
