@@ -23,4 +23,5 @@ jobs:
   
     # 3. Compilar firmware
     - name: Build firmware
-      run: make
+      run: ls -R
+      # run: make (este falló)
