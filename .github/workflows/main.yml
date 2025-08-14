@@ -23,5 +23,6 @@ jobs:
   
     # 3. Compilar firmware
     - name: Build firmware
-      run: ls -R
-      # run: make (este falló)
+      run: |
+        make -C ci-cd-implementation/Proyecto-2024-utnfrt/Debug
+        make -C ci-cd-implementation/Proyecto-2024-utnfrt/Debug bin
