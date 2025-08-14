@@ -1,0 +1,38 @@
+name: STM32 Build CI
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Clonar el repositorio
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 2. Instalar toolchain ARM
+      - name: Install ARM GCC toolchain
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc-arm-none-eabi binutils-arm-none-eabi make
+
+      # 3. Compilar firmware
+      - name: Build firmware
+        run: make all
+
+      # 4. Generar archivo .bin
+      - name: Generate .bin
+        run: make bin
+
+      # 5. Guardar artefacto compilado
+      - name: Upload firmware binary
+        uses: actions/upload-artifact@v4
+        with:
+          name: firmware-bin
+          path: Debug/*.bin
+
