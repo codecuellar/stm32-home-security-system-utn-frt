@@ -23,7 +23,7 @@ QEMU: Emulador para pruebas básicas
 Azure Blob Storage: Almacenamiento en la nube para versiones estables
 
 Proceso de Implementación
-1. Configuración del Makefile
+1. Configuración del Makefile /*comentario de prueba de disparo de workflow*/
 El primer paso fue crear un Makefile que permitiera compilar el proyecto fuera del entorno STM32CubeIDE. Esto incluyó:
 
 Definir las rutas a los archivos fuente y cabeceras
