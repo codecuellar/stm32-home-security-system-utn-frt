@@ -21,20 +21,29 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y gcc-arm-none-eabi make
 
-      # 3. Compilar firmware
+      # 3 listar carpeta raiz (debug)
+      - name: Listar carpeta raíz (debug)
+        run: ls -la
+
+      #4 listar debug
+      - name: Listar Debug (debug)
+        run: ls -la ci-cd-implementation/Proyecto-2024-utnfrt/Debug
+
+      # 5. Compilar firmware
       - name: Build firmware
+        working directory: ci-cd-implementation/Proyecto-2024-utnfrt/Debug
         run: |
-            make -C ci-cd-implementation/Proyecto-2024-utnfrt/Debug
-            make -C ci-cd-implementation/Proyecto-2024-utnfrt/Debug bin
+            make all
+            make bin
 
       # 4. Generar archivo .bin
       #- name: Generate .bin
       #  run: make bin
 
       # 5. Guardar artefacto compilado
-      #- name: Upload firmware binary
-      #  uses: actions/upload-artifact@v4
-      #  with:
-      #    name: firmware-bin
-      #    path: Debug/*.bin
+      - name: Upload firmware binary #subir artefacto
+        uses: actions/upload-artifact@v4
+        with:
+          name: firmware-bin
+          path: ci-cd-implementation/Proyecto-2024-utnfrt/Debug/*.bin
 
