@@ -31,7 +31,7 @@ jobs:
 
       # 5. Compilar firmware
       - name: Build firmware
-        working directory: ci-cd-implementation/Proyecto-2024-utnfrt/Debug
+        working-directory: ci-cd-implementation/Proyecto-2024-utnfrt/Debug
         run: |
             make all
             make bin
